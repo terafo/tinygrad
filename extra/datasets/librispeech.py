@@ -64,6 +64,36 @@ def load_wav(file):
   sample = soundfile.read(file)[0].astype(np.float32)
   return sample, sample.shape[0]
 
+def iterate(bs=1, start=0, val=True):
+  if val:
+    print(f"there are {len(ci)} samples in the dataset")
+    for i in range(start, len(ci), bs):
+      samples, sample_lens = zip(*[load_wav(BASEDIR / v["files"][0]["fname"]) for v in ci[i : i + bs]])
+      samples = list(samples)
+      # pad to same length
+      max_len = max(sample_lens)
+      for j in range(len(samples)):
+        samples[j] = np.pad(samples[j], (0, max_len - sample_lens[j]), "constant")
+      samples, sample_lens = np.array(samples), np.array(sample_lens)
+
+      yield feature_extract(samples, sample_lens), np.array([v["transcript"] for v in ci[i : i + bs]])
+  else:
+    print(f"there are {len(ci)} samples in the dataset")
+    for i in range(start, len(ci), bs):
+      samples, sample_lens = zip(*[load_wav(BASEDIR / v["files"][0]["fname"]) for v in ci[i : i + bs]])
+      samples = list(samples)
+      # pad to same length
+      max_len = max(sample_lens)
+      for j in range(len(samples)):
+        samples[j] = np.pad(samples[j], (0, max_len - sample_lens[j]), "constant")
+      samples, sample_lens = np.array(samples), np.array(sample_lens)
+
+      LABELS = [" ", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "'"]
+      transcript_labels = []
+      for v in ci[i : i + bs]:
+        transcript_labels.append([LABELS.index(c) for c in v["transcript"]])
+      yield feature_extract(samples, sample_lens), np.array(transcript_labels).astype(np.float32), np.array([v["transcript"] for v in ci[i : i + bs]])
+
 def iterate(bs=1, start=0):
   print(f"there are {len(ci)} samples in the dataset")
   for i in range(start, len(ci), bs):
