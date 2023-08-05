@@ -12,7 +12,6 @@ class RNNT:
     self.prediction = Prediction(vocab_size, pred_hidden_size, pred_layers, dropout)
     self.joint = Joint(vocab_size, pred_hidden_size, enc_hidden_size, joint_hidden_size, dropout)
 
-  @TinyJit
   def __call__(self, x, y, hc=None):
     f, _ = self.encoder(x, None)
     g, _ = self.prediction(y, hc, Tensor.ones(1, requires_grad=False))
@@ -98,10 +97,10 @@ class LSTMCell:
   def __init__(self, input_size, hidden_size, dropout):
     self.dropout = dropout
 
-    self.weights_ih = Tensor.uniform(hidden_size * 4, input_size)
-    self.bias_ih = Tensor.uniform(hidden_size * 4)
-    self.weights_hh = Tensor.uniform(hidden_size * 4, hidden_size)
-    self.bias_hh = Tensor.uniform(hidden_size * 4)
+    self.weights_ih = Tensor.uniform(hidden_size * 4, input_size) * (1 / (hidden_size ** 0.5))
+    self.bias_ih = Tensor.uniform(hidden_size * 4) * (1 / (hidden_size ** 0.5))
+    self.weights_hh = Tensor.uniform(hidden_size * 4, hidden_size) * (1 / (hidden_size ** 0.5))
+    self.bias_hh = Tensor.uniform(hidden_size * 4) * (1 / (hidden_size ** 0.5))
 
   def __call__(self, x, hc):
     gates = x.linear(self.weights_ih.T, self.bias_ih) + hc[:x.shape[0]].linear(self.weights_hh.T, self.bias_hh)
