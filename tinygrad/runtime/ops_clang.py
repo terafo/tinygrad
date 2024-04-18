@@ -6,7 +6,7 @@ from tinygrad.renderer.cstyle import uops_to_cstyle, CStyleLanguage
 CLANG_PROGRAM_HEADER = '#include <stdbool.h>\n#include <tgmath.h>\n#define max(x,y) ((x>y)?x:y)\n#define half __fp16\n'
 
 class ClangCompiler(Compiler):
-  compiler_opts = CompilerOptions("CLANG", supports_float4=False, has_local=False)
+  compiler_opts = CompilerOptions("CLANG", supported_vector_types=None, has_local=False)
   def render(self, name:str, uops) -> str: return CLANG_PROGRAM_HEADER + uops_to_cstyle(CStyleLanguage(buffer_suffix=" restrict"), name, uops)
   def compile(self, src:str) -> bytes:
     # TODO: remove file write. sadly clang doesn't like the use of /dev/stdout here

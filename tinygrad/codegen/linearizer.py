@@ -77,11 +77,11 @@ class Linearizer(Kernel):
     expand_vars = expand_idxs(idxs)
 
     dim, amt = None, 1
-    # float 4 grouping
-    if len(upcast_dim := self.get_float4_upcast_dim(i)) == 1 and len(float4_expand := expand_node(idxs[upcast_dim[0]])) in [4,2]:
-      dim, amt = upcast_dim[0], len(float4_expand)
-      g_idx, g_valid = self.sts[i].expr_idxs(idxs[:dim] + [float4_expand[0]] + idxs[dim+1:])
-      # do not use float4 if idx is not aligned
+    # vectorized grouping
+    if len(upcast_dim := self.get_vectorized_upcast_dim(i)) == 1 and len(vectorized_expand := expand_node(idxs[upcast_dim[0]])) in {j.count for j in self.opts.supported_vector_types}:
+      dim, amt = upcast_dim[0], len(vectorized_expand)
+      g_idx, g_valid = self.sts[i].expr_idxs(idxs[:dim] + [vectorized_expand[0]] + idxs[dim+1:])
+      # do not use vectorization if idx is not aligned
       if g_idx != (g_idx//amt*amt): dim, amt = None, 1
     if dim is None:
       g_idx, g_valid = self.sts[i].expr_idxs(idxs)
@@ -137,17 +137,17 @@ class Linearizer(Kernel):
     _idxs = zip(*[expand_node(idx, expand_vars) for idx in idxs]) if idxs else [tuple()]  # transpose
     store_offset = dict(zip(_idxs, store))
 
-    # float4 grouping
-    if len(upcast_dim := self.get_float4_upcast_dim(i)) == 1 and len(float4_expand := expand_node(idxs[upcast_dim[0]])) in [2,4]:
+    # vectorized grouping
+    if len(upcast_dim := self.get_vectorized_upcast_dim(i)) == 1 and len(vectorized_expand := expand_node(idxs[upcast_dim[0]])) in {j.count for j in self.opts.supported_vector_types}:
       grouped_store_offset = defaultdict(list)
       for k in store_offset:
-        _idx = k[:upcast_dim[0]] + (float4_expand[0],) + k[upcast_dim[0]+1:]
+        _idx = k[:upcast_dim[0]] + (vectorized_expand[0],) + k[upcast_dim[0]+1:]
         grouped_store_offset[_idx].append(store_offset[k])
       store_offset_new = {}
       for k,grouped in grouped_store_offset.items():
         amt = len(grouped)
         idx, valid = self.sts[i].expr_idxs(k)
-        assert idx == ((idx//amt)*amt), "float4 stores are always aligned"
+        assert idx == ((idx//amt)*amt), "vectorized stores are always aligned"
         store_offset_new[k] = self.uops.add(UOps.CAST, buf.dtype.vec(amt), tuple(grouped))
       store_offset = store_offset_new
 

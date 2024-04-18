@@ -134,7 +134,14 @@ class Kernel:
 
   # TODO: these need more tests or it might silently be no-op
   def shape_offsets(self, i:int): return itertools.product(*[list(range(cast(int, s))) for s in self.sts[i].shape[self.shape_len-self.upcasted:][::-1]]) if self.upcasted > 0 else [tuple()]  # noqa: E501
-  def float4_axis(self, i:int): return [x-(self.shape_len-self.upcasted) for x in self.sts[i].unit_stride_axes() if x >= self.shape_len-self.upcasted and self.sts[i].shape[x]%4 == 0]  # noqa: E501
+  # TODO FIX
+  def vectorized_axis(self, i:int): 
+    # change size if image type
+    sizes = [4] if isinstance(self.bufs[i].dtype, ImageDType) else [x for x in self.opts.supported_vector_types if x.scalar() == self.bufs[i].dtype]
+    for s in sorted(sizes, reverse=True):
+      if len(res:=[x-(self.shape_len-self.upcasted) for x in self.sts[i].unit_stride_axes() if x >= self.shape_len-self.upcasted and self.sts[i].shape[x]%s == 0]):  # noqa: E501
+        return res
+    return []
 
   def upcasted_axis(self, i:int) -> List[Tuple[int, Optional[sint], bool]]:
     upcasted_shape, upcasted_stride = self.sts[i].shape[self.shape_len-self.upcasted:], self.sts[i].real_strides()[self.shape_len-self.upcasted:]
@@ -149,9 +156,13 @@ class Kernel:
     acc_strides = [x*(1-upcasted_i[::-1][i][2]) for i,x in enumerate(strides_for_shape(tuple(1 if r else s for s,_,r in upcasted_i[::-1])))]
     return [sum(t) for t in itertools.product(*[[y*acc_strides[i] for y in range(x[0])] for i,x in enumerate(upcasted_i[::-1])])]
 
-  def get_float4_upcast_dim(self, i:int) -> List[int]:
-    should_upcast = self.opts.supports_float4 and (self.bufs[i].dtype in (dtypes.float, dtypes.half) or isinstance(self.bufs[i].dtype, ImageDType))
-    return [x for x in self.sts[i].unit_stride_axes() if x >= self.shape_len-self.upcasted and self.sts[i].shape[x] > 1] if should_upcast else []
+  def get_vectorized_upcast_dim(self, i:int) -> List[int]:
+    #FIXME: this is maybe broken for image types, 
+    should_upcast = self.bufs[i].dtype.scalar() in (j.scalar() for j in self.opts.supported_vector_types)
+    res = [x for x in self.sts[i].unit_stride_axes() if x >= self.shape_len-self.upcasted and self.sts[i].shape[x] > 1] if should_upcast else []
+    # print(self.bufs[i].dtype)
+    # print("get_vectorized_upcast_dim", i, should_upcast, self.bufs[i].dtype, self.sts[i].shape, self.sts[i].unit_stride_axes(), res)
+    return res
 
   @property
   def first_reduce(self) -> int:
@@ -451,11 +462,11 @@ class Kernel:
     elif opt.op is OptOps.UPCAST:                     # yellow
       check(axis < self.first_reduce, "upcast is for non-reduce")
       check(not(self.tensor_core and axis >= self.first_reduce-len(self.tensor_core.threads)), "can't upcast TC locals")
-      check(amt <= 8, "don't upcast more than 8")
+      check((amt <= 8 or amt in (j.count for j in self.opts.supported_vector_types)), "don't upcast more than 8 for non-vectorized types")
       self.shift_to(axis, amt, insert_before=None)
       self.upcast()
     elif opt.op is OptOps.UPCASTMID:                  # white
-      check(self.bufs[0].dtype.name.startswith('image') and not self.float4_axis(0) and self.group_for_reduces != 0 and self.first_reduce <= 2 and prod(self.sts[0].shape) > 1, "invalid upcast mid reduce")  # noqa: E501
+      check(self.bufs[0].dtype.name.startswith('image') and not self.vectorized_axis(0) and self.group_for_reduce and self.first_reduce <= 2 and prod(self.sts[0].shape) > 1, "invalid upcast mid reduce")  # noqa: E501
       axes = self.sts[0].unit_stride_axes()
       check(len(axes) == 1, f"wrong number of stride 1 axis : {axes}")
       check(axes[0] == axis, "wrong axis")
@@ -515,7 +526,7 @@ class Kernel:
 
     if self.opts.has_local and self.opts.has_shared and all_int(self.sts[0].shape[:self.first_reduce]):
       # are we grouping? (requires local shape support)
-      if not self.float4_axis(0) and self.first_reduce <= 2 and self.first_reduce + 1 <= self.shape_len and prod(self.sts[0].shape[:self.first_reduce]) <= 2048:  # noqa: E501
+      if not self.vectorized_axis(0) and self.first_reduce <= 2 and self.first_reduce + 1 <= self.shape_len and prod(self.sts[0].shape[:self.first_reduce]) <= 2048:  # noqa: E501
         # TODO: use 1024 if it's allowed in a smarter way
         for sz in (([256, 16]) if prod(self.sts[0].shape[:self.first_reduce]) <= 32 else [16]):
           if all(st.shape[self.first_reduce] % sz == 0 or st.shape[self.first_reduce] == 1 for st in self.sts):
@@ -525,7 +536,7 @@ class Kernel:
             except KernelOptError: pass
 
       # are we upcasting in mid reduce? (only for images)
-      if self.bufs[0].dtype.name.startswith('image') and not self.float4_axis(0) and self.group_for_reduces and self.first_reduce <= 2 and prod(self.sts[0].shape) > 1:  # noqa: E501
+      if self.bufs[0].dtype.name.startswith('image') and not self.vectorized_axis(0) and self.group_for_reduces and self.first_reduce <= 2 and prod(self.sts[0].shape) > 1:  # noqa: E501
         axes = self.sts[0].unit_stride_axes()
         assert len(axes) == 1, f"wrong number of stride 1 axis : {axes}"
         if self.sts[0].shape[axes[0]]%4 == 0:
@@ -573,7 +584,7 @@ class Kernel:
           xb_choices.append((sum(st.views[-1].strides[axis]>0 for st in self.sts), sum(st.views[-1].strides[axis] for st in self.sts), axis, upcast_amount))  # noqa: E501
       if xb_choices:
         xb_choices = sorted(xb_choices)
-        if DEBUG >= 4: print(f"float4 merging axis : {xb_choices}")
+        if DEBUG >= 4: print(f"vectorized merging axis : {xb_choices}")
         self.apply_opt(Opt(OptOps.UPCAST, xb_choices[0][2], xb_choices[0][3]))
         upcasted_axis.add(xb_choices[0][2])
       else: break
@@ -593,7 +604,8 @@ class Kernel:
 
     # if nothing at all is upcasted and it's easy to, do an upcast
     # TODO: this is breaking the tests
-    for splits in [4]:
+    for splits in sorted([j.count for j in self.opts.supported_vector_types], reverse=True):
+      print("splits:", splits, sorted([j.count for j in self.opts.supported_vector_types], reverse=True))      
       if self.upcasted == 0 and self.full_unupcasted_shape and self.full_unupcasted_shape[-1] % splits == 0:
         self.apply_opt(Opt(OptOps.UPCAST, len(self.full_unupcasted_shape)-1, splits))
 

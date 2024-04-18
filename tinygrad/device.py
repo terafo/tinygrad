@@ -2,6 +2,7 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import TYPE_CHECKING, Any, List, Optional, Dict, Tuple, ClassVar, NamedTuple
 import importlib, inspect, functools, pathlib, time, ctypes, os
+from tinygrad.dtype import DType, dtypes
 from tinygrad.helpers import ansilen, prod, getenv, colored, all_int, to_function_name, from_mv, flat_mv, diskcache_get, diskcache_put
 from tinygrad.helpers import DEBUG, BEAM, NOOPT, GlobalCounters
 from tinygrad.shape.symbolic import Variable, sym_infer, sint
@@ -134,7 +135,7 @@ class CompilerOptions(NamedTuple):
   device: str = ""
   suffix: str = ""
   # TODO: make this generic with a list of supported types
-  supports_float4: bool = True
+  supported_vector_types: Optional[List[DType]] = [dtypes.float.vec(4), dtypes.half.vec(4)]
   has_local: bool = True
   has_shared: bool = True
   has_tensor_cores: bool = False

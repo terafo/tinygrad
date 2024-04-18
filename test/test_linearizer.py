@@ -97,7 +97,7 @@ class TestLinearizer(unittest.TestCase):
     assert num_ops <= 1, "more alu uops than needed"
 
   def test_reduce_upcast(self):
-    if not Device[Device.DEFAULT].compiler.compiler_opts.supports_float4:
+    if not Device[Device.DEFAULT].compiler.compiler_opts.supported_vector_types:
       self.skipTest("device does not support upcast")
     x, w = Tensor.randn((1,1,3)).realize(), Tensor.randn((1,1,2)).realize()
     r = Tensor.conv2d(x,w,padding=1).relu()
@@ -113,7 +113,7 @@ class TestLinearizer(unittest.TestCase):
     assert stores[0].vin[-1].dtype == accs[0].dtype == dtypes.float.vec(4)
 
   def test_upcast_with_locals(self):
-    if not (opts:=Device[Device.DEFAULT].compiler.compiler_opts).has_local or not opts.has_shared or not opts.supports_float4:
+    if not (opts:=Device[Device.DEFAULT].compiler.compiler_opts).has_local or not opts.has_shared or not opts.supported_vector_types:
       self.skipTest("device does not support upcasted reduce with locals")
 
     x, y = Tensor.rand(1,128), Tensor.rand(128, 128)
@@ -277,7 +277,7 @@ def helper_realized_ast(r:Tensor):
   output_buffer = Buffer((out:=s[-1].outputs[0]).device, out.size, out.dtype).allocate()
   return s[-1].ast[0], [output_buffer] + list(s[-1].inputs)
 
-@unittest.skipUnless(Device[Device.DEFAULT].compiler.compiler_opts.supports_float4, "need backends that support float4")
+@unittest.skipUnless(Device[Device.DEFAULT].compiler.compiler_opts.supported_vector_types != [], "need backends that support float4")
 class TestFloat4(unittest.TestCase):
   @staticmethod
   def count_float4(k):
@@ -857,7 +857,7 @@ class TestLinearizerHelper(unittest.TestCase):
     assert expand_idxs(idxs) == (uidx0, NumNode(0), uidx1)
 
 class TestLinearizerUOptimize(unittest.TestCase):
-  @unittest.skipUnless(Device[Device.DEFAULT].compiler.compiler_opts.supports_float4, "device doesn't support float4")
+  @unittest.skipUnless(Device[Device.DEFAULT].compiler.compiler_opts.supported_vector_types != [], "device doesn't support float4")
   def test_grouped_store_phis(self):
     x, y = Tensor.randn(64,64), Tensor.randn(64,64)
     out = x.matmul(y)
@@ -871,7 +871,7 @@ class TestLinearizerUOptimize(unittest.TestCase):
     for val in store_vals:
       assert val.dtype == dtypes.float.vec(4) and val.uop is not UOps.CAST
 
-  @unittest.skipUnless(Device[Device.DEFAULT].compiler.compiler_opts.supports_float4, "device doesn't support float4")
+  @unittest.skipUnless(Device[Device.DEFAULT].compiler.compiler_opts.supported_vector_types != [], "device doesn't support float4")
   def test_grouped_store_values(self):
     x = Tensor.randn((4,3,6,6)).realize()
     out = x.flip((0,1)).contiguous()
@@ -885,7 +885,7 @@ class TestLinearizerUOptimize(unittest.TestCase):
 
   def test_grouped_store_locals_and_globals(self):
     if not Device[Device.DEFAULT].compiler.compiler_opts.has_local or not Device[Device.DEFAULT].compiler.compiler_opts.has_shared or \
-       not Device[Device.DEFAULT].compiler.compiler_opts.supports_float4:
+       not Device[Device.DEFAULT].compiler.compiler_opts.supported_vector_types:
       self.skipTest("Only Compiled uses linearizer with locals, shared, and float4")
 
     x, y = Tensor.rand(128, 128), Tensor.rand(128, 128)
@@ -910,7 +910,7 @@ class TestLinearizerUOptimize(unittest.TestCase):
 
   def test_grouped_store_local_only(self):
     if not Device[Device.DEFAULT].compiler.compiler_opts.has_local or not Device[Device.DEFAULT].compiler.compiler_opts.has_shared or \
-       not Device[Device.DEFAULT].compiler.compiler_opts.supports_float4:
+       not Device[Device.DEFAULT].compiler.compiler_opts.supported_vector_types:
       self.skipTest("Only Compiled uses linearizer with locals, shared, and float4")
 
     x, y = Tensor.rand(1,128), Tensor.rand(128, 128)
@@ -929,7 +929,7 @@ class TestLinearizerUOptimize(unittest.TestCase):
     assert stores[1].vin[-1].dtype == dtypes.float
 
   def test_skip_unmatching_upcasts(self):
-    if not Device[Device.DEFAULT].compiler.compiler_opts.has_local or not Device[Device.DEFAULT].compiler.compiler_opts.supports_float4:
+    if not Device[Device.DEFAULT].compiler.compiler_opts.has_local or not Device[Device.DEFAULT].compiler.compiler_opts.supported_vector_types:
       self.skipTest("Needs locals and float4")
     ast = LazyOp(op=BufferOps.STORE, src=(LazyOp(op=BufferOps.LOAD, src=(), arg=MemBuffer(idx=1, dtype=dtypes.float, st=ShapeTracker(views=(View(shape=(240, 40, 1, 1), strides=(1, 240, 0, 0), offset=0, mask=None, contiguous=False),)))),), arg=MemBuffer(idx=0, dtype=dtypes.float, st=ShapeTracker(views=(View(shape=(240, 40, 1, 1), strides=(40, 1, 0, 0), offset=0, mask=None, contiguous=True),)))) # noqa: E501
     opts = [
@@ -945,7 +945,7 @@ class TestLinearizerUOptimize(unittest.TestCase):
     assert out.vin[-1].uop is UOps.CAST and out.vin[-1].dtype == dtypes.float.vec(4)
 
   def test_skip_unmatching_upcasts_with_gep(self):
-    if not Device[Device.DEFAULT].compiler.compiler_opts.has_local or not Device[Device.DEFAULT].compiler.compiler_opts.supports_float4:
+    if not Device[Device.DEFAULT].compiler.compiler_opts.has_local or not Device[Device.DEFAULT].compiler.compiler_opts.supported_vector_types:
       self.skipTest("Needs locals and float4")
     ast = LazyOp(op=BufferOps.STORE, src=(LazyOp(op=BufferOps.LOAD, src=(), arg=MemBuffer(idx=1, dtype=dtypes.float, st=ShapeTracker(views=(View(shape=(8, 32, 1, 1), strides=(1, 8, 0, 0), offset=0, mask=None, contiguous=False),)))),), arg=MemBuffer(idx=0, dtype=dtypes.float, st=ShapeTracker(views=(View(shape=(8, 32, 1, 1), strides=(32, 1, 0, 0), offset=0, mask=None, contiguous=True),)))) # noqa: E501
     opts = [Opt(op=OptOps.LOCAL, axis=1, amt=4), Opt(op=OptOps.UPCAST, axis=2, amt=2), Opt(op=OptOps.LOCAL, axis=1, amt=8),

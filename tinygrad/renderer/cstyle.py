@@ -20,7 +20,7 @@ class CStyleLanguage(NamedTuple):
   global_max: List[int] = []
   local_max: List[int] = []
   extra_args: List[str] = []
-  float4: Optional[str] = None
+  to_vectorized: Dict[DType, str] = {}
   uses_vload: bool = False
   uses_ptr_arithmetic: bool = False
   type_map: Dict[DType, str] = {}
@@ -37,8 +37,9 @@ class CStyleLanguage(NamedTuple):
     if bitcast: return f"(*(({self.buffer_prefix}{self.render_dtype(var_dtype)}*)&{x[0]}))"
     if len(x) == 1: return f"({self.render_dtype(var_dtype)})({x[0]})"
     assert len(x) == var_dtype.count, f"cast is wrong size {len(x)} != {var_dtype.count}"
-    assert self.float4 is not None, "vectorized cast is not supported on this platform"
-    return f"{self.float4.replace('float4', self.render_dtype(var_dtype))}({','.join(x)})"
+    assert len(self.to_vectorized) > 0, "vectorized cast is not supported on this platform"
+    assert var_dtype in self.to_vectorized, f"vectorized cast is not supported for {var_dtype.vec(len(x))}"
+    return f"{self.to_vectorized[var_dtype].replace(var_dtype.name, self.render_dtype(var_dtype))}({','.join(x)})"
 
   # returns a str expression of the const with the given type
   def render_const(self, x:ConstType, dtype:DType) -> str:
@@ -239,7 +240,8 @@ class CUDALanguage(CStyleLanguage):
   smem_prefix = "__shared__ "
   smem_prefix_for_cast = False
   barrier = "__syncthreads();"
-  float4 = "make_float4"
+  to_vectorized = {dtypes.float16.vec(4): "make_half4", dtypes.float32.vec(4): "make_float4", dtypes.float16.vec(2): "make_half2", dtypes.float32.vec(2): "make_float2", 
+                  dtypes.int32.vec(2): "make_int2", dtypes.int32.vec(4): "make_int4", dtypes.bfloat16.vec(4): "make_bfloat164", dtypes.float16.vec(8): "make_half8", dtypes.bfloat16.vec(8): "make_bfloat168"} 
   code_for_workitem = {"g": lambda x: f"blockIdx.{chr(120+x)}", "l": lambda x: f"threadIdx.{chr(120+x)}",
                        "i": lambda x: f"(blockIdx.{chr(120+x)}*blockDim.{chr(120+x)}+threadIdx.{chr(120+x)})"}
   code_for_op = {**CStyleLanguage().code_for_op, **code_for_op_half}
