@@ -78,7 +78,7 @@ class Linearizer(Kernel):
 
     dim, amt = None, 1
     # vectorized grouping
-    if len(upcast_dim := self.get_vectorized_upcast_dim(i)) == 1 and len(vectorized_expand := expand_node(idxs[upcast_dim[0]])) in {j.count for j in self.opts.supported_vector_types}:
+    if len(upcast_dim := self.get_vectorized_upcast_dim(i)) == 1 and len(vectorized_expand := expand_node(idxs[upcast_dim[0]])) in {j.count for j in self.opts.supported_vector_types if j.scalar() == buf.dtype}:
       dim, amt = upcast_dim[0], len(vectorized_expand)
       g_idx, g_valid = self.sts[i].expr_idxs(idxs[:dim] + [vectorized_expand[0]] + idxs[dim+1:])
       # do not use vectorization if idx is not aligned
@@ -138,7 +138,7 @@ class Linearizer(Kernel):
     store_offset = dict(zip(_idxs, store))
 
     # vectorized grouping
-    if len(upcast_dim := self.get_vectorized_upcast_dim(i)) == 1 and len(vectorized_expand := expand_node(idxs[upcast_dim[0]])) in {j.count for j in self.opts.supported_vector_types}:
+    if len(upcast_dim := self.get_vectorized_upcast_dim(i)) == 1 and len(vectorized_expand := expand_node(idxs[upcast_dim[0]])) in {j.count for j in self.opts.supported_vector_types if j.scalar() == buf.dtype}:
       grouped_store_offset = defaultdict(list)
       for k in store_offset:
         _idx = k[:upcast_dim[0]] + (vectorized_expand[0],) + k[upcast_dim[0]+1:]

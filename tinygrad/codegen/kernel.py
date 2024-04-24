@@ -626,7 +626,7 @@ class Kernel:
     # if nothing at all is upcasted and it's easy to, do an upcast
     # TODO: this is breaking the tests
     for splits in sorted([j.count for j in self.opts.supported_vector_types], reverse=True):
-      print("splits:", splits, sorted([j.count for j in self.opts.supported_vector_types], reverse=True))      
+      # print("splits:", splits, sorted([j.count for j in self.opts.supported_vector_types], reverse=True))      
       if self.upcasted == 0 and self.full_unupcasted_shape and self.full_unupcasted_shape[-1] % splits == 0:
         self.apply_opt(Opt(OptOps.UPCAST, len(self.full_unupcasted_shape)-1, splits))
 

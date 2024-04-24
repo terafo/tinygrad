@@ -38,8 +38,8 @@ class CStyleLanguage(NamedTuple):
     if len(x) == 1: return f"({self.render_dtype(var_dtype)})({x[0]})"
     assert len(x) == var_dtype.count, f"cast is wrong size {len(x)} != {var_dtype.count}"
     assert len(self.to_vectorized) > 0, "vectorized cast is not supported on this platform"
-    assert var_dtype in self.to_vectorized, f"vectorized cast is not supported for {var_dtype.vec(len(x))}"
-    return f"{self.to_vectorized[var_dtype].replace(var_dtype.name, self.render_dtype(var_dtype))}({','.join(x)})"
+    assert var_dtype in self.to_vectorized, f"vectorized cast is not supported for {var_dtype.name}"
+    return f"{self.to_vectorized[var_dtype]}({','.join(x)})"
 
   # returns a str expression of the const with the given type
   def render_const(self, x:ConstType, dtype:DType) -> str:
@@ -233,7 +233,7 @@ code_for_op_half = {BinaryOps.MAX: lambda a,b,dtype: f"__hmax({a},{b})" if dtype
 _nms = "xyzwabcdefghijkl"
 def _make_cuda_dtype(base_type, name, cnt):
   vec, elems, header = f"{name}{cnt}", ', '.join(_nms[:cnt]), ', '.join([f"{base_type} {x}" for x in _nms[:cnt]])
-  return f"struct {vec} {{ {base_type} {elems}; }}; __device__ {vec} make_{vec}({header}) {{ {vec} r={{{elems}}}; return r; }}"
+  return f"struct {vec} {{ {base_type} {elems}; }}; typedef struct {vec} {base_type}{cnt}; __device__ {vec} make_{vec}({header}) {{ {vec} r={{{elems}}}; return r; }}"
 
 class CUDALanguage(CStyleLanguage):
   kernel_prefix = "extern \"C\" __global__ "
@@ -241,7 +241,7 @@ class CUDALanguage(CStyleLanguage):
   smem_prefix_for_cast = False
   barrier = "__syncthreads();"
   to_vectorized = {dtypes.float16.vec(4): "make_half4", dtypes.float32.vec(4): "make_float4", dtypes.float16.vec(2): "make_half2", dtypes.float32.vec(2): "make_float2", 
-                  dtypes.int32.vec(2): "make_int2", dtypes.int32.vec(4): "make_int4", dtypes.bfloat16.vec(4): "make_bfloat164", dtypes.float16.vec(8): "make_half8", dtypes.bfloat16.vec(8): "make_bfloat168"} 
+                  dtypes.int32.vec(2): "make_int2", dtypes.int32.vec(4): "make_int4", dtypes.bfloat16.vec(4): "make_bfloat164", dtypes.float16.vec(8): "make_half8", dtypes.bfloat16.vec(8): "make_bfloat168"}  
   code_for_workitem = {"g": lambda x: f"blockIdx.{chr(120+x)}", "l": lambda x: f"threadIdx.{chr(120+x)}",
                        "i": lambda x: f"(blockIdx.{chr(120+x)}*blockDim.{chr(120+x)}+threadIdx.{chr(120+x)})"}
   code_for_op = {**CStyleLanguage().code_for_op, **code_for_op_half}
@@ -265,7 +265,6 @@ class CUDALanguage(CStyleLanguage):
 asm( "mma.sync.aligned.m16n8k16.row.col.{co}.{ci}.{ci}.{co} {{ %0, %1, %2, %3 }}, {{ %4, %5, %6, %7 }}, {{ %8, %9 }}, {{ %0, %1, %2, %3 }};"
   : "+f"(c.x), "+f"(c.y), "+f"(c.z), "+f"(c.w) : "r"(a_pk[0]), "r"(a_pk[1]), "r"(a_pk[2]),  "r"(a_pk[3]), "r"(b_pk[0]), "r"(b_pk[1]) );
 return c;}}""")
-
     return super().render_kernel(function_name, kernel, bufs, uops, prefix=prefix)
 CUDARenderer = functools.partial(uops_to_cstyle, CUDALanguage())
 
