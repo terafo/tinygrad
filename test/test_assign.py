@@ -171,9 +171,20 @@ class TestAssign(unittest.TestCase):
     b = Tensor.full((4,), 3).contiguous().realize()
     a += b
     b += a
-    Tensor.corealize([a,b])
+    Tensor.realize(a,b)
     np.testing.assert_allclose(a.numpy(), 5)
     np.testing.assert_allclose(b.numpy(), 8)
+
+  def test_assign_double_diamond(self):
+    a = Tensor.full((4,), 2).contiguous().realize()
+    b = Tensor.full((4,), 3).contiguous().realize()
+    a_prev = a*4
+    b_prev = b+3
+    b += a_prev.contiguous()
+    a += b_prev.contiguous()
+    Tensor.realize(a, b)
+    np.testing.assert_equal(b.numpy(), 11)
+    np.testing.assert_equal(a.numpy(), 8)
 
   def test_crossunder_assign(self):
     # NOTE: should *not* raise AssertionError from numpy
@@ -183,7 +194,7 @@ class TestAssign(unittest.TestCase):
       c = a+9
       a += b
       b += c
-      Tensor.corealize([a,b])
+      Tensor.realize(a,b)
       np.testing.assert_allclose(a.numpy(), 2+3)
       np.testing.assert_allclose(b.numpy(), 3+2+9)
 
