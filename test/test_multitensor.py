@@ -1,6 +1,6 @@
 import unittest, functools, random
 from typing import List
-from tinygrad import Tensor, Device, nn, GlobalCounters, TinyJit
+from tinygrad import Tensor, Device, nn, GlobalCounters, TinyJit, dtypes
 from tinygrad.device import BufferCopy, CompiledRunner
 from tinygrad.ops import LoadOps, ReduceOps
 from tinygrad.helpers import CI, prod, Context
@@ -11,6 +11,7 @@ from tinygrad.features.multi import all_reduce, MultiLazyBuffer
 from random import randint
 import numpy as np
 from hypothesis import given, strategies as strat, settings
+from test.helpers import is_dtype_supported
 
 settings.register_profile("my_profile", max_examples=200, deadline=None)
 settings.load_profile("my_profile")
@@ -130,6 +131,20 @@ class TestMultiTensor(unittest.TestCase):
     fX = f(X)
     fn = f(n)
     np.testing.assert_allclose(fX.numpy(), fn, rtol=1e-6, atol=1e-6)
+
+  def _test_allreduce(self):
+    t = Tensor.rand(256, 256)
+    aa = (t[0:64] + t[64:128] + t[128:192] + t[192:256]).repeat([4,1]).numpy()
+    ts = t.shard(tuple([d0, d1, d2, d3]), 0).realize()
+    b = Tensor(MultiLazyBuffer(all_reduce(ReduceOps.SUM, ts.lazydata.lbs), 0))
+    b.realize()
+    np.testing.assert_almost_equal(aa, b.numpy(), decimal=5)
+
+  def test_allreduce_naive(self):
+    with Context(RING=0): self._test_allreduce()
+
+  def test_allreduce_ring(self):
+    with Context(RING=2): self._test_allreduce()
 
   @unittest.skip("slow")
   def test_fuzz_allreduce(self):
@@ -489,7 +504,9 @@ class TestShrinkMultiTensorShardedAxis(unittest.TestCase):
     assert p.shape == (8, 8)
     assert p.lazydata.real == [True, True, True, True]
 
-  def test_ops(self):
+  @given(strat.sampled_from([dtypes.float, dtypes.int, dtypes.int64, dtypes.int16]))
+  def test_ops(self, dtype):
+    if not is_dtype_supported(dtype): return
     t = Tensor.arange(64).reshape(8, 8).contiguous().realize()
     t.shard_([f"{Device.DEFAULT}:{i}" for i in range(4)], axis=0)
     for i in range(4):
