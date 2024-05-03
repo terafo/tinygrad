@@ -123,7 +123,7 @@ class CompilerOptions:
   device: str = ""
   suffix: str = ""
   # TODO: make this generic with a list of supported types
-  supported_vector_types: Optional[List[DType]] = [dtypes.float.vec(4), dtypes.half.vec(4)]
+  supported_vector_types: Optional[List[DType]] = None
   has_local: bool = True
   has_shared: bool = True
   has_tensor_cores: bool = False
