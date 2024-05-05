@@ -192,6 +192,10 @@ class Kernel:
   @property
   def global_dims(self) -> int: return self.first_reduce-self.local_dims
 
+  @property
+  def vec_lengths(self) -> List[int]:
+    return sorted([j.count for j in self.opts.supported_vector_types if j.scalar() == self.bufs[0].dtype], reverse=True)
+
   # there's eight chunks of the shape
   # blue   -- global dims
   # cyan   -- local dims (warp ones first)
@@ -485,11 +489,11 @@ class Kernel:
     elif opt.op is OptOps.UPCAST:                     # yellow
       check(axis < self.first_reduce, "upcast is for non-reduce")
       check(not(self.tensor_core and axis >= self.first_reduce-len(self.tensor_core.threads)), "can't upcast TC locals")
-      check((amt <= 8 or amt in (j.count for j in self.opts.supported_vector_types)), "don't upcast more than 8 for non-vectorized types")
+      check((amt <= 8 or amt in self.vec_lengths), "don't upcast more than 8 for non-vectorized types")
       self.shift_to(axis, amt, insert_before=None)
       self.upcast()
     elif opt.op is OptOps.UPCASTMID:                  # white
-      check(self.bufs[0].dtype.name.startswith('image') and not self.vectorized_axis(0) and self.group_for_reduce and self.first_reduce <= 2 and prod(self.sts[0].shape) > 1, "invalid upcast mid reduce")  # noqa: E501
+      check(self.bufs[0].dtype.name.startswith('image') and not self.vectorized_axis(0) and self.group_for_reduces != 0 and self.first_reduce <= 2 and prod(self.sts[0].shape) > 1, "invalid upcast mid reduce")  # noqa: E501
       axes = self.sts[0].unit_stride_axes()
       check(len(axes) == 1, f"wrong number of stride 1 axis : {axes}")
       check(axes[0] == axis, "wrong axis")
@@ -614,13 +618,13 @@ class Kernel:
 
     # if last dim is small(ish) and it's a reduce dim, upcast the reduce (loop unrolling). no simplify needed since it's just an upcast.
     if self.first_reduce < (self.shape_len-self.upcasted) and (len(list(self.shape_offsets(self.full_buf_index))) <= 4 or not any(r for _,_,r in self.upcasted_axis(self.full_buf_index))) and (self.upcasted == 0 or prod(self.full_shape[-self.upcasted:]) < 64):  # noqa: E501
-      if (s:=self.full_unupcasted_shape[-1]) <= 32 and isinstance(s, int):  # NOTE: cannot loop unroll symbolic axis
+      if ((s:=self.full_unupcasted_shape[-1]) <= 32 or s in self.vec_lengths) and isinstance(s, int):  # NOTE: cannot loop unroll symbolic axis
         self.apply_opt(Opt(OptOps.UNROLL, len(self.full_unupcasted_shape)-1-self.first_reduce, 0))
         # if it's small, upcast a second reduce dimension too
         if self.first_reduce < (self.shape_len-self.upcasted) and s <= 3 and (s2:=self.full_unupcasted_shape[-1]) <= 3 and isinstance(s2, int):
           self.apply_opt(Opt(OptOps.UNROLL, len(self.full_unupcasted_shape)-1-self.first_reduce, 0))
       else:
-        for splits in sorted([j.count for j in self.opts.supported_vector_types if j.scalar() == self.bufs[0].dtype], reverse=True):
+        for splits in self.vec_lengths:
           if self.full_unupcasted_shape[-1]%splits == 0:
             self.apply_opt(Opt(OptOps.UNROLL, len(self.full_unupcasted_shape)-1-self.first_reduce, splits))
             break
@@ -628,7 +632,7 @@ class Kernel:
     # if nothing at all is upcasted and it's easy to, do an upcast
     # TODO: this is breaking the tests
     # TODO: this might not work for multi-output kernels, but it's not clear how to handle that
-    for splits in sorted([j.count for j in self.opts.supported_vector_types if j.scalar() == self.bufs[0].dtype], reverse=True):
+    for splits in self.vec_lengths:
       if self.upcasted == 0 and self.full_unupcasted_shape and self.full_unupcasted_shape[-1] % splits == 0:
         self.apply_opt(Opt(OptOps.UPCAST, len(self.full_unupcasted_shape)-1, splits))
 
