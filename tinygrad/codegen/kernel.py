@@ -483,7 +483,7 @@ class Kernel:
       self.shift_to(axis, amt, insert_before=None)
       self.upcast()
     elif opt.op is OptOps.UPCAST:                     # yellow
-      check(axis <= self.first_reduce, "upcast is for non-reduce")
+      check(axis < self.first_reduce, "upcast is for non-reduce")
       check(not(self.tensor_core and axis >= self.first_reduce-len(self.tensor_core.threads)), "can't upcast TC locals")
       check((amt <= 8 or amt in (j.count for j in self.opts.supported_vector_types)), "don't upcast more than 8 for non-vectorized types")
       self.shift_to(axis, amt, insert_before=None)
@@ -620,7 +620,7 @@ class Kernel:
         if self.first_reduce < (self.shape_len-self.upcasted) and s <= 3 and (s2:=self.full_unupcasted_shape[-1]) <= 3 and isinstance(s2, int):
           self.apply_opt(Opt(OptOps.UNROLL, len(self.full_unupcasted_shape)-1-self.first_reduce, 0))
       else:
-        for splits in [4]:
+        for splits in sorted([j.count for j in self.opts.supported_vector_types if j.scalar() == self.bufs[0].dtype], reverse=True):
           if self.full_unupcasted_shape[-1]%splits == 0:
             self.apply_opt(Opt(OptOps.UNROLL, len(self.full_unupcasted_shape)-1-self.first_reduce, splits))
             break
