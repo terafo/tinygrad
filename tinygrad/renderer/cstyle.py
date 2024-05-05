@@ -170,7 +170,7 @@ def uops_to_cstyle(lang:CStyleLanguage, function_name:str, uops:UOpGraph) -> str
       elif uop is UOps.GEP:
         assert vin[0].dtype is not None
         from_ssa = vin[0].uop in {UOps.LOAD, UOps.WMMA, UOps.DEFINE_ACC}
-        r[u] = (r[vin[0]] if from_ssa else f"{(r[vin[0]])}") + (f"[{args}]" if vin[0].dtype.count > 4 else f".{'xyzw'[args]}")
+        r[u] = (r[vin[0]] if from_ssa else f"{(r[vin[0]])}") + (f"[{args}]" if vin[0].dtype.count not in {i.count for i in lang.to_vectorized} else f".{'xyzwabcd'[args]}") 
       else: raise RuntimeError(f"failed to render {uop}")
 
   return lang.render_kernel(function_name, kernel, bufs, uops)

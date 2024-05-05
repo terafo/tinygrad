@@ -166,8 +166,6 @@ class Kernel:
     #FIXME: this is maybe broken for image types, 
     should_upcast = self.bufs[i].dtype.scalar() in (j.scalar() for j in self.opts.supported_vector_types)
     res = [x for x in self.sts[i].unit_stride_axes() if x >= self.shape_len-self.upcasted and self.sts[i].shape[x] > 1] if should_upcast else []
-    # print(self.bufs[i].dtype)
-    # print("get_vectorized_upcast_dim", i, should_upcast, self.bufs[i].dtype, self.sts[i].shape, self.sts[i].unit_stride_axes(), res)
     return res
 
   @property
@@ -484,7 +482,7 @@ class Kernel:
       self.shift_to(axis, amt, insert_before=None)
       self.upcast()
     elif opt.op is OptOps.UPCAST:                     # yellow
-      check(axis < self.first_reduce, "upcast is for non-reduce")
+      check(axis <= self.first_reduce, "upcast is for non-reduce")
       check(not(self.tensor_core and axis >= self.first_reduce-len(self.tensor_core.threads)), "can't upcast TC locals")
       check((amt <= 8 or amt in (j.count for j in self.opts.supported_vector_types)), "don't upcast more than 8 for non-vectorized types")
       self.shift_to(axis, amt, insert_before=None)
@@ -628,8 +626,8 @@ class Kernel:
 
     # if nothing at all is upcasted and it's easy to, do an upcast
     # TODO: this is breaking the tests
-    for splits in sorted([j.count for j in self.opts.supported_vector_types], reverse=True):
-      # print("splits:", splits, sorted([j.count for j in self.opts.supported_vector_types], reverse=True))      
+    # TODO: this might not work for multi-output kernels, but it's not clear how to handle that
+    for splits in sorted([j.count for j in self.opts.supported_vector_types if j.scalar() == self.bufs[0].dtype], reverse=True):
       if self.upcasted == 0 and self.full_unupcasted_shape and self.full_unupcasted_shape[-1] % splits == 0:
         self.apply_opt(Opt(OptOps.UPCAST, len(self.full_unupcasted_shape)-1, splits))
 
