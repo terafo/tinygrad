@@ -54,7 +54,7 @@ def _get_bytes(arg, get_str, get_sz, check) -> bytes:
   return ctypes.string_at(init_c_var(ctypes.create_string_buffer(sz.value), lambda x: check(get_str(arg, x))), size=sz.value)
 
 class PTXCompiler(Compiler):
-  compiler_opts = CompilerOptions("CUDA", suffix="PTX", global_max=[65535, 65535, 2147483647], local_max=[64, 1024, 1024], shared_max=49152)
+  compiler_opts = CompilerOptions("CUDA", suffix="PTX", supported_vector_types=[], global_max=[65535, 65535, 2147483647], local_max=[64, 1024, 1024], shared_max=49152)
   def __init__(self, arch:str):
     self.arch = arch
     self.version = "7.8" if arch >= "sm_89" else "7.5"
