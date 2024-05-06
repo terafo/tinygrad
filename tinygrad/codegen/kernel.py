@@ -148,7 +148,7 @@ class Kernel:
   def vectorized_axis(self, i:int): 
     # change size if image type
     sizes = [4] if isinstance(self.bufs[i].dtype, ImageDType) else self.get_vec_lengths(i)
-    for s in sorted(sizes, reverse=True):
+    for s in sizes:
       if len(res:=[x-(self.shape_len-self.upcasted) for x in self.sts[i].unit_stride_axes() if x >= self.shape_len-self.upcasted and self.sts[i].shape[x]%s == 0]):  # noqa: E501
         return res
     return []
@@ -170,11 +170,10 @@ class Kernel:
     #FIXME: this is maybe broken for image types, 
     should_upcast = self.get_vec_lengths(i) or isinstance(self.bufs[i].dtype, ImageDType)
     res = [x for x in self.sts[i].unit_stride_axes() if x >= self.shape_len-self.upcasted and self.sts[i].shape[x] > 1] if should_upcast else []
-    print(res)
     return res
   
-  def get_vec_lengths(self, axis:int = 0) -> List[int]:
-    return sorted([j.count for j in self.opts.supported_vector_types if j.scalar() == self.bufs[axis].dtype], reverse=True)
+  def get_vec_lengths(self, buf:int = 0) -> List[int]:
+    return sorted([j.count for j in self.opts.supported_vector_types if j.scalar() == self.bufs[buf].dtype and j.count >= self.bufs[buf].size], reverse=True)
 
   @property
   def first_reduce(self) -> int:
