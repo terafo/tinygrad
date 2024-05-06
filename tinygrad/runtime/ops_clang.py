@@ -4,7 +4,7 @@ from tinygrad.helpers import cpu_time_execution
 from tinygrad.renderer.cstyle import ClangRenderer
 
 class ClangCompiler(Compiler):
-  compiler_opts = CompilerOptions("CLANG", supported_vector_types=None, has_local=False)
+  compiler_opts = CompilerOptions("CLANG", supported_vector_types=[], has_local=False)
   def render(self, name:str, uops) -> str: return ClangRenderer(name, uops)
   def compile(self, src:str) -> bytes:
     # TODO: remove file write. sadly clang doesn't like the use of /dev/stdout here

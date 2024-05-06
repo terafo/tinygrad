@@ -188,7 +188,8 @@ class OpenCLLanguage(CStyleLanguage):
   smem_align = "__attribute__ ((aligned (16))) "
   smem_prefix = "__local "
   barrier = "barrier(CLK_LOCAL_MEM_FENCE);"
-  float4 = "(float4)"
+  to_vectorized = {dtypes.float32.vec(4): "(float4)", dtypes.float16.vec(4): "(half4)", dtypes.float16.vec(2): "(half2)", dtypes.float32.vec(2): "(float2)",
+                   dtypes.int32.vec(2): "(int2)", dtypes.int32.vec(4): "(int4)"}
   code_for_workitem = {"g": lambda x: f"get_group_id({x})", "l": lambda x: f"get_local_id({x})", "i": lambda x: f"get_global_id({x})"}
   uses_vload = True
   type_map = { dtypes.uint8: "uchar", dtypes.uint32: "uint", dtypes.uint16: "ushort", dtypes.uint64: "ulong" }
@@ -206,7 +207,8 @@ class MetalLanguage(CStyleLanguage):
   smem_prefix = "threadgroup "
   arg_int_prefix = "constant int&"
   barrier = "threadgroup_barrier(mem_flags::mem_threadgroup);"
-  float4 = "float4"
+  to_vectorized = {dtypes.float32.vec(4): "float4", dtypes.float16.vec(4): "half4", dtypes.float16.vec(2): "half2", dtypes.float32.vec(2): "float2",
+                   dtypes.int32.vec(2): "int2", dtypes.int32.vec(4): "int4"}
   uses_ptr_arithmetic = True
   code_for_workitem = {"g": lambda x: f"gid.{chr(120+x)}", "l": lambda x: f"lid.{chr(120+x)}"}
   extra_args = ['uint3 gid [[threadgroup_position_in_grid]]', 'uint3 lid [[thread_position_in_threadgroup]]']
@@ -313,7 +315,8 @@ f"""  __attribute__((device)) __attribute__((const)) {dt} __ocml_fmax_f{n}({dt},
   smem_prefix = "__attribute__((shared))"
   barrier = '__builtin_amdgcn_fence(__ATOMIC_RELEASE, "workgroup");' + '__builtin_amdgcn_s_barrier();' + \
             '__builtin_amdgcn_fence(__ATOMIC_ACQUIRE, "workgroup");'
-  float4 = "make_float4"
+  to_vectorized = {dtypes.float16.vec(4): "make_half4", dtypes.float32.vec(4): "make_float4", dtypes.float16.vec(2): "make_float2", dtypes.float32.vec(2): "make_float2", 
+                   dtypes.int32.vec(2): "make_int2", dtypes.int32.vec(4): "make_int4"}
   uses_ptr_arithmetic = False  # NOTE: this fixes TestLinearizerOverflowAlt
   type_map = {dtypes.bfloat16: "hip_bfloat16"}
 
