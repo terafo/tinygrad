@@ -4,7 +4,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, List, Optional, Dict, Tuple, ClassVar, cast
 import importlib, inspect, functools, pathlib, time, ctypes, os
-from tinygrad.dtype import DType, dtypes
+from tinygrad.dtype import DType
 from tinygrad.helpers import prod, getenv, colored, all_int, to_function_name, from_mv, flat_mv, diskcache_get, diskcache_put, DEBUG, BEAM, NOOPT
 from tinygrad.shape.symbolic import Variable, sym_infer, sint
 from tinygrad.ops import LazyOp, get_lazyop_info

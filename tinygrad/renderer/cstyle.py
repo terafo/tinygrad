@@ -171,7 +171,7 @@ def uops_to_cstyle(lang:CStyleLanguage, function_name:str, uops:UOpGraph) -> str
       elif uop is UOps.GEP:
         assert vin[0].dtype is not None
         from_ssa = vin[0].uop in {UOps.LOAD, UOps.WMMA, UOps.DEFINE_ACC}
-        r[u] = (r[vin[0]] if from_ssa else f"{(r[vin[0]])}") + (f"[{args}]" if vin[0].dtype.count not in {i.count for i in lang.to_vectorized} else f".{'xyzwabcd'[args]}") 
+        r[u] = (r[vin[0]] if from_ssa else f"{(r[vin[0]])}") + (f"[{args}]" if vin[0].dtype.count not in {i.count for i in lang.to_vectorized} else f".{'xyzwabcd'[args]}")
       else: raise RuntimeError(f"failed to render {uop}")
 
   return lang.render_kernel(function_name, kernel, bufs, uops)
@@ -248,8 +248,8 @@ class CUDALanguage(CStyleLanguage):
   smem_prefix = "__shared__ "
   smem_prefix_for_cast = False
   barrier = "__syncthreads();"
-  to_vectorized = {dtypes.float16.vec(4): "make_half4", dtypes.float32.vec(4): "make_float4", dtypes.float16.vec(2): "make_half2", dtypes.float32.vec(2): "make_float2", 
-                  dtypes.int32.vec(2): "make_int2", dtypes.int32.vec(4): "make_int4", dtypes.bfloat16.vec(4): "make_bfloat164", dtypes.float16.vec(8): "make_half8", dtypes.bfloat16.vec(8): "make_bfloat168"}  
+  to_vectorized = {dtypes.float16.vec(4): "make_half4", dtypes.float32.vec(4): "make_float4", dtypes.float16.vec(2): "make_half2", dtypes.float32.vec(2): "make_float2",
+                  dtypes.int32.vec(2): "make_int2", dtypes.int32.vec(4): "make_int4", dtypes.bfloat16.vec(4): "make_bfloat164", dtypes.float16.vec(8): "make_half8", dtypes.bfloat16.vec(8): "make_bfloat168"}
   code_for_workitem = {"g": lambda x: f"blockIdx.{chr(120+x)}", "l": lambda x: f"threadIdx.{chr(120+x)}",
                        "i": lambda x: f"(blockIdx.{chr(120+x)}*blockDim.{chr(120+x)}+threadIdx.{chr(120+x)})"}
   code_for_op = {**CStyleLanguage().code_for_op, **code_for_op_half}
@@ -315,7 +315,7 @@ f"""  __attribute__((device)) __attribute__((const)) {dt} __ocml_fmax_f{n}({dt},
   smem_prefix = "__attribute__((shared))"
   barrier = '__builtin_amdgcn_fence(__ATOMIC_RELEASE, "workgroup");' + '__builtin_amdgcn_s_barrier();' + \
             '__builtin_amdgcn_fence(__ATOMIC_ACQUIRE, "workgroup");'
-  to_vectorized = {dtypes.float16.vec(4): "make_half4", dtypes.float32.vec(4): "make_float4", dtypes.float16.vec(2): "make_float2", dtypes.float32.vec(2): "make_float2", 
+  to_vectorized = {dtypes.float16.vec(4): "make_half4", dtypes.float32.vec(4): "make_float4", dtypes.float16.vec(2): "make_float2", dtypes.float32.vec(2): "make_float2",
                    dtypes.int32.vec(2): "make_int2", dtypes.int32.vec(4): "make_int4"}
   uses_ptr_arithmetic = False  # NOTE: this fixes TestLinearizerOverflowAlt
   type_map = {dtypes.bfloat16: "hip_bfloat16"}

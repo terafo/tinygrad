@@ -145,7 +145,7 @@ class Kernel:
   # TODO: these need more tests or it might silently be no-op
   def shape_offsets(self, i:int): return itertools.product(*[list(range(cast(int, s))) for s in self.sts[i].shape[self.shape_len-self.upcasted:][::-1]]) if self.upcasted > 0 else [tuple()]  # noqa: E501
   # TODO FIX
-  def vectorized_axis(self, i:int): 
+  def vectorized_axis(self, i:int):
     # change size if image type
     sizes = [4] if isinstance(self.bufs[i].dtype, ImageDType) else self.get_vec_lengths(i)
     for s in sizes:
@@ -167,13 +167,13 @@ class Kernel:
     return [sum(t) for t in itertools.product(*[[y*acc_strides[i] for y in range(x[0])] for i,x in enumerate(upcasted_i[::-1])])]
 
   def get_vectorized_upcast_dim(self, i:int) -> List[int]:
-    #FIXME: this is maybe broken for image types, 
+    #FIXME: this is maybe broken for image types,
     should_upcast = self.get_vec_lengths(i) or isinstance(self.bufs[i].dtype, ImageDType)
     res = [x for x in self.sts[i].unit_stride_axes() if x >= self.shape_len-self.upcasted and self.sts[i].shape[x] > 1] if should_upcast else []
     return res
-  
+
   def get_vec_lengths(self, buf:int = 0) -> List[int]:
-    return sorted([j.count for j in self.opts.supported_vector_types if j.scalar() == self.bufs[buf].dtype and j.count >= self.bufs[buf].size], reverse=True)
+    return sorted([j.count for j in self.opts.supported_vector_types if j.scalar() == self.bufs[buf].dtype], reverse=True)
 
   @property
   def first_reduce(self) -> int:
