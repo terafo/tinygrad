@@ -168,8 +168,9 @@ class Kernel:
 
   def get_vectorized_upcast_dim(self, i:int) -> List[int]:
     #FIXME: this is maybe broken for image types, 
-    should_upcast = self.bufs[i].dtype.scalar() in (j.scalar() for j in self.opts.supported_vector_types)
+    should_upcast = self.get_vec_lengths(i) or isinstance(self.bufs[i].dtype, ImageDType)
     res = [x for x in self.sts[i].unit_stride_axes() if x >= self.shape_len-self.upcasted and self.sts[i].shape[x] > 1] if should_upcast else []
+    print(res)
     return res
   
   def get_vec_lengths(self, axis:int = 0) -> List[int]:
