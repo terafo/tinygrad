@@ -149,7 +149,7 @@ class Kernel:
     # change size if image type
     sizes = [4] if isinstance(self.bufs[i].dtype, ImageDType) else self.get_vec_lengths(i)
     for s in sizes:
-      if len(res:=[x-(self.shape_len-self.upcasted) for x in self.sts[i].unit_stride_axes() if x >= self.shape_len-self.upcasted and self.sts[i].shape[x]%s == 0]):  # noqa: E501
+      if len(res := [x-(self.shape_len-self.upcasted) for x in self.sts[i].unit_stride_axes() if x >= self.shape_len-self.upcasted and self.sts[i].shape[x]%s == 0]):  # noqa: E501
         return res
     return []
 
@@ -173,7 +173,7 @@ class Kernel:
     return res
 
   def get_vec_lengths(self, buf:int = 0) -> List[int]:
-    return sorted([j.count for j in self.opts.supported_vector_types if j.scalar() == self.bufs[buf].dtype], reverse=True)
+    return sorted([j.count for j in self.opts.supported_vector_types if j.scalar() == self.bufs[buf].dtype] + [4] if isinstance(self.bufs[buf].dtype, ImageDType) else [], reverse=True)
 
   @property
   def first_reduce(self) -> int:

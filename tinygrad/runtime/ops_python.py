@@ -179,9 +179,11 @@ class PythonProgram:
     return time.perf_counter() - st
 
 class PythonCompiler(Compiler):
-  compiler_opts = CompilerOptions("METAL", supported_vector_types=list(MetalLanguage.to_vectorized.keys()), has_tensor_cores=True) if getenv("EMULATE_METAL") else \
+  compiler_opts = \
+    CompilerOptions("METAL", supported_vector_types=list(MetalLanguage.to_vectorized.keys()), has_tensor_cores=True) if getenv("EMULATE_METAL") else \
     (CompilerOptions("HSA", supported_vector_types=list(HIPLanguage.to_vectorized.keys()), has_tensor_cores=True) if getenv("EMULATE_HSA") else \
-    (CompilerOptions("CUDA", supported_vector_types=list(CUDALanguage.to_vectorized.keys()), has_tensor_cores=True) if getenv("EMULATE_CUDA") else CompilerOptions("PYTHON", supported_vector_types=[])))
+    (CompilerOptions("CUDA", supported_vector_types=list(CUDALanguage.to_vectorized.keys()), has_tensor_cores=True) if getenv("EMULATE_CUDA") else
+    CompilerOptions("PYTHON", supported_vector_types=list(MetalLanguage.to_vectorized.keys()))))
   def render(self, name:str, uops:UOpGraph) -> str:
     lops = [(u.uop, u.dtype, [uops.uops.index(v) for v in u.vin], u.arg) for u in uops]
     return base64.b64encode(pickle.dumps(lops)).decode()
