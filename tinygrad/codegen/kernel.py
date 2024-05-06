@@ -173,7 +173,7 @@ class Kernel:
     return res
 
   def get_vec_lengths(self, buf:int = 0) -> List[int]:
-    return sorted([j.count for j in self.opts.supported_vector_types if j.scalar() == self.bufs[buf].dtype] + [4] if isinstance(self.bufs[buf].dtype, ImageDType) else [], reverse=True)
+    return sorted([j.count for j in self.opts.supported_vector_types if j.scalar() == self.bufs[buf].dtype] + ([4] if isinstance(self.bufs[buf].dtype, ImageDType) else []), reverse=True)
 
   @property
   def first_reduce(self) -> int:
