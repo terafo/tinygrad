@@ -315,7 +315,7 @@ f"""  __attribute__((device)) __attribute__((const)) {dt} __ocml_fmax_f{n}({dt},
   smem_prefix = "__attribute__((shared))"
   barrier = '__builtin_amdgcn_fence(__ATOMIC_RELEASE, "workgroup");' + '__builtin_amdgcn_s_barrier();' + \
             '__builtin_amdgcn_fence(__ATOMIC_ACQUIRE, "workgroup");'
-  to_vectorized = {dtypes.float16.vec(4): "make_half4", dtypes.float32.vec(4): "make_float4", dtypes.float16.vec(2): "make_float2", dtypes.float32.vec(2): "make_float2",
+  to_vectorized = {dtypes.float16.vec(4): "make_half4", dtypes.float32.vec(4): "make_float4", dtypes.float16.vec(2): "make_half2", dtypes.float32.vec(2): "make_float2",
                    dtypes.int32.vec(2): "make_int2", dtypes.int32.vec(4): "make_int4"}
   uses_ptr_arithmetic = False  # NOTE: this fixes TestLinearizerOverflowAlt
   type_map = {dtypes.bfloat16: "hip_bfloat16"}
