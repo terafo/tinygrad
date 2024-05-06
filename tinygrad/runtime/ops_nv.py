@@ -67,7 +67,7 @@ def nvdata64(data): return (data >> 32, data & 0xFFFFFFFF)
 def nvdata64_le(data): return (data & 0xFFFFFFFF, data >> 32)
 
 class NVCompiler(Compiler):
-  compiler_opts = CompilerOptions("NV", global_max=[65535, 65535, 2147483647], local_max=[64, 1024, 1024], shared_max=49152)
+  compiler_opts = CompilerOptions("NV", supported_vector_types=[], global_max=[65535, 65535, 2147483647], local_max=[64, 1024, 1024], shared_max=49152)
   def __init__(self, arch:str):
     self.arch = arch
     NVCompiler.compiler_opts = replace(NVCompiler.compiler_opts, has_tensor_cores=int(arch[3:]) >= 80)

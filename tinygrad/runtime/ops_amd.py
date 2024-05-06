@@ -4,7 +4,7 @@ import os, fcntl, ctypes, functools, re, pathlib, mmap, struct, errno, subproces
 from tinygrad.device import Compiled, LRUAllocator, Compiler, CompilerOptions
 from tinygrad.buffer import BufferOptions
 from tinygrad.helpers import getenv, from_mv, init_c_struct_t, to_mv, round_up, DEBUG
-from tinygrad.renderer.cstyle import HIPRenderer
+from tinygrad.renderer.cstyle import HIPLanguage, HIPRenderer
 from tinygrad.runtime.driver.hip_comgr import compile_hip
 import tinygrad.runtime.autogen.kfd as kfd
 import tinygrad.runtime.autogen.hsa as hsa
@@ -69,7 +69,7 @@ def create_sdma_packets():
 sdma_pkts = create_sdma_packets()
 
 class AMDCompiler(Compiler):
-  compiler_opts = CompilerOptions("AMD", has_tensor_cores=True, shared_max=65536)
+  compiler_opts = CompilerOptions("AMD", supported_vector_types=list(HIPLanguage.to_vectorized.keys()), has_tensor_cores=True, shared_max=65536)
   def __init__(self, arch:str):
     self.arch = arch
     super().__init__(f"compile_hip_{self.arch}")

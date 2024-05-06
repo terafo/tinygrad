@@ -8,6 +8,7 @@ from tinygrad.helpers import all_same, getenv, flatten
 from tinygrad.device import Compiled, Allocator, Compiler, CompilerOptions
 from tinygrad.codegen.uops import UOpGraph, UOps
 from tinygrad.ops import BinaryOps, TernaryOps, exec_alu
+from tinygrad.renderer.cstyle import CUDALanguage, HIPLanguage, MetalLanguage
 
 def _load(m, i):
   if i < 0 or i >= len(m): raise IndexError(f"load out of bounds, size is {len(m)} and access is {i}")
@@ -178,9 +179,9 @@ class PythonProgram:
     return time.perf_counter() - st
 
 class PythonCompiler(Compiler):
-  compiler_opts = CompilerOptions("METAL", has_tensor_cores=True) if getenv("EMULATE_METAL") else \
-    (CompilerOptions("HSA", has_tensor_cores=True) if getenv("EMULATE_HSA") else \
-    (CompilerOptions("CUDA", has_tensor_cores=True) if getenv("EMULATE_CUDA") else CompilerOptions("PYTHON")))
+  compiler_opts = CompilerOptions("METAL", supported_vector_types=list(MetalLanguage.to_vectorized.keys()), has_tensor_cores=True) if getenv("EMULATE_METAL") else \
+    (CompilerOptions("HSA", supported_vector_types=list(HIPLanguage.to_vectorized.keys()), has_tensor_cores=True) if getenv("EMULATE_HSA") else \
+    (CompilerOptions("CUDA", supported_vector_types=list(CUDALanguage.to_vectorized.keys()), has_tensor_cores=True) if getenv("EMULATE_CUDA") else CompilerOptions("PYTHON", supported_vector_types=[])))
   def render(self, name:str, uops:UOpGraph) -> str:
     lops = [(u.uop, u.dtype, [uops.uops.index(v) for v in u.vin], u.arg) for u in uops]
     return base64.b64encode(pickle.dumps(lops)).decode()

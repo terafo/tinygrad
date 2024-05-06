@@ -4,7 +4,7 @@ import Metal, libdispatch
 from typing import List, Set, Any, Tuple, Optional
 from tinygrad.helpers import prod, getenv, DEBUG, unwrap2
 from tinygrad.device import Compiled, LRUAllocator, Compiler, CompilerOptions
-from tinygrad.renderer.cstyle import MetalRenderer
+from tinygrad.renderer.cstyle import MetalLanguage, MetalRenderer
 
 def wait_check(cbuf: Any):
   cbuf.waitUntilCompleted()
@@ -12,7 +12,7 @@ def wait_check(cbuf: Any):
     raise RuntimeError(error)
 
 class MetalCompiler(Compiler):
-  compiler_opts = CompilerOptions("METAL", has_tensor_cores=os.uname().machine == "arm64", shared_max=32768)
+  compiler_opts = CompilerOptions("METAL", supported_vector_types=list(MetalLanguage.to_vectorized.keys()), has_tensor_cores=os.uname().machine == "arm64", shared_max=32768)
   def __init__(self, device:Optional[MetalDevice]):
     self.device = device
     super().__init__("compile_metal")

@@ -3,7 +3,7 @@ from typing import Tuple, Optional, List, cast
 import ctypes, functools, hashlib
 import tinygrad.runtime.autogen.opencl as cl
 from tinygrad.helpers import init_c_var, to_char_p_p, from_mv, OSX, DEBUG
-from tinygrad.renderer.cstyle import OpenCLRenderer
+from tinygrad.renderer.cstyle import OpenCLLanguage, OpenCLRenderer
 from tinygrad.buffer import BufferOptions
 from tinygrad.device import Compiled, LRUAllocator, Compiler, CompilerOptions
 
@@ -15,7 +15,7 @@ def check(status):
 def checked(ret, status): return (check(status.value), ret)[1]
 
 class CLCompiler(Compiler):
-  compiler_opts = CompilerOptions("GPU")
+  compiler_opts = CompilerOptions("GPU", supported_vector_types=list(OpenCLLanguage.to_vectorized.keys()))
   def __init__(self, device:CLDevice, compile_key:str):
     self.device = device
     super().__init__(f"compile_cl_{compile_key}")

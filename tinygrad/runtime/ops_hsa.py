@@ -5,7 +5,7 @@ import tinygrad.runtime.autogen.hsa as hsa
 from tinygrad.helpers import DEBUG, init_c_var, from_mv, round_up, to_mv, init_c_struct_t, getenv
 from tinygrad.device import Compiled, LRUAllocator, Compiler, CompilerOptions
 from tinygrad.buffer import BufferOptions
-from tinygrad.renderer.cstyle import HIPRenderer
+from tinygrad.renderer.cstyle import HIPLanguage, HIPRenderer
 from tinygrad.runtime.driver.hsa import check, scan_agents, find_memory_pool, AQLQueue
 from tinygrad.runtime.driver.hip_comgr import compile_hip
 if getenv("IOCTL"): import extra.hip_gpu_driver.hip_ioctl  # noqa: F401
@@ -43,7 +43,7 @@ class HSAProfiler:
 Profiler = HSAProfiler()
 
 class HSACompiler(Compiler):
-  compiler_opts = CompilerOptions("HSA", has_tensor_cores=True, shared_max=65536)
+  compiler_opts = CompilerOptions("HSA", supported_vector_types=list(HIPLanguage.to_vectorized.keys()), has_tensor_cores=True, shared_max=65536)
   def __init__(self, arch:str):
     self.arch = arch
     super().__init__(f"compile_hip_{self.arch}")
