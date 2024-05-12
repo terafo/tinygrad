@@ -3,7 +3,7 @@ from typing import Tuple, List, Any, cast
 import os, fcntl, ctypes, functools, re, pathlib, mmap, struct, errno, subprocess, time
 from tinygrad.device import Compiled, Compiler, BufferOptions, LRUAllocator
 from tinygrad.helpers import getenv, from_mv, init_c_struct_t, to_mv, round_up, DEBUG
-from tinygrad.renderer.cstyle import HIPLanguage, HIPRenderer
+from tinygrad.renderer.cstyle import HIPRenderer
 from tinygrad.runtime.driver.hip_comgr import compile_hip
 from tinygrad.runtime.ops_hsa import HSACompiler
 import tinygrad.runtime.autogen.kfd as kfd
