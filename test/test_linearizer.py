@@ -181,7 +181,7 @@ class TestLinearizer(unittest.TestCase):
     assert num_ops <= 1, "more alu uops than needed"
 
   def test_reduce_upcast(self):
-    if not Device[Device.DEFAULT].compiler.compiler_opts.supported_vector_types:
+    if not Device[Device.DEFAULT].renderer.supported_vector_types:
       self.skipTest("device does not support upcast")
     x, w = Tensor.randn((1,1,3)).realize(), Tensor.randn((1,1,2)).realize()
     r = Tensor.conv2d(x,w,padding=1).relu()
@@ -402,7 +402,7 @@ class TestLinearizer(unittest.TestCase):
     helper(Tensor.arange(256), max_ops=2)
     helper(Tensor.arange(255), max_ops=2)
 
-@unittest.skipUnless(Device[Device.DEFAULT].compiler.compiler_opts.supported_vector_types != [], "need backends that support float4")
+@unittest.skipUnless(Device[Device.DEFAULT].renderer.supported_vector_types != [], "need backends that support float4")
 class TestFloat4(unittest.TestCase):
   @staticmethod
   def count_float4(k):
@@ -1019,7 +1019,7 @@ class TestLinearizerHelper(unittest.TestCase):
     assert expand_idxs(idxs) == (uidx0, NumNode(0), uidx1)
 
 class TestLinearizerUOptimize(unittest.TestCase):
-  @unittest.skipUnless(Device[Device.DEFAULT].compiler.compiler_opts.supported_vector_types != [], "device doesn't support float4")
+  @unittest.skipUnless(Device[Device.DEFAULT].renderer.supported_vector_types != [], "device doesn't support float4")
   def test_grouped_store_phis(self):
     x, y = Tensor.randn(64,64), Tensor.randn(64,64)
     out = x.matmul(y)
@@ -1033,7 +1033,7 @@ class TestLinearizerUOptimize(unittest.TestCase):
     for val in store_vals:
       assert val.dtype == dtypes.float.vec(4) and val.uop is not UOps.CAST
 
-  @unittest.skipUnless(Device[Device.DEFAULT].compiler.compiler_opts.supported_vector_types != [], "device doesn't support float4")
+  @unittest.skipUnless(Device[Device.DEFAULT].renderer.supported_vector_types != [], "device doesn't support float4")
   def test_grouped_store_values(self):
     x = Tensor.randn((4,3,6,6)).realize()
     out = x.flip((0,1)).contiguous()
