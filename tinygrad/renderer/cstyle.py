@@ -19,7 +19,7 @@ class CStyleLanguage(Renderer):
   barrier: str = ""
   code_for_workitem: Dict[Union[Literal["g"], Literal["l"], Literal["i"]], Callable] = {}
   extra_args: List[str] = []
-  to_vectorized: Dict[DType, str] = {}
+  supported_vector_types: Dict[DType, str] = {}
   uses_vload: bool = False
   uses_ptr_arithmetic: bool = False
   type_map: Dict[DType, str] = {}
@@ -36,9 +36,9 @@ class CStyleLanguage(Renderer):
     if bitcast: return f"(*(({self.buffer_prefix}{self.render_dtype(var_dtype)}*)&{x[0]}))"
     if len(x) == 1: return f"({self.render_dtype(var_dtype)})({x[0]})"
     assert len(x) == var_dtype.count, f"cast is wrong size {len(x)} != {var_dtype.count}"
-    assert len(self.to_vectorized) > 0, "vectorized cast is not supported on this platform"
-    assert var_dtype in self.to_vectorized, f"vectorized cast is not supported for {var_dtype.name}"
-    return f"{self.to_vectorized[var_dtype]}({','.join(x)})"
+    assert len(self.supported_vector_types) > 0, "vectorized cast is not supported on this platform"
+    assert var_dtype in self.supported_vector_types, f"vectorized cast is not supported for {var_dtype.name}"
+    return f"{self.supported_vector_types[var_dtype]}({','.join(x)})"
 
   # returns a str expression of the const with the given type
   def render_const(self, x:ConstType, dtype:DType) -> str:
@@ -194,7 +194,7 @@ class OpenCLRenderer(CStyleLanguage):
   smem_align = "__attribute__ ((aligned (16))) "
   smem_prefix = "__local "
   barrier = "barrier(CLK_LOCAL_MEM_FENCE);"
-  to_vectorized = {dtypes.float32.vec(4): "(float4)", dtypes.float16.vec(4): "(half4)", dtypes.float16.vec(2): "(half2)", dtypes.float32.vec(2): "(float2)",
+  supported_vector_types = {dtypes.float32.vec(4): "(float4)", dtypes.float16.vec(4): "(half4)", dtypes.float16.vec(2): "(half2)", dtypes.float32.vec(2): "(float2)",
                    dtypes.int32.vec(2): "(int2)", dtypes.int32.vec(4): "(int4)"}
   code_for_workitem = {"g": lambda x: f"get_group_id({x})", "l": lambda x: f"get_local_id({x})", "i": lambda x: f"get_global_id({x})"}
   uses_vload = True
@@ -218,7 +218,7 @@ class MetalRenderer(CStyleLanguage):
   smem_prefix = "threadgroup "
   arg_int_prefix = "constant int&"
   barrier = "threadgroup_barrier(mem_flags::mem_threadgroup);"
-  to_vectorized = {dtypes.float32.vec(4): "float4", dtypes.float16.vec(4): "half4", dtypes.float16.vec(2): "half2", dtypes.float32.vec(2): "float2",
+  supported_vector_types = {dtypes.float32.vec(4): "float4", dtypes.float16.vec(4): "half4", dtypes.float16.vec(2): "half2", dtypes.float32.vec(2): "float2",
                    dtypes.int32.vec(2): "int2", dtypes.int32.vec(4): "int4"}
   uses_ptr_arithmetic = True
   code_for_workitem = {"g": lambda x: f"gid.{chr(120+x)}", "l": lambda x: f"lid.{chr(120+x)}"}
@@ -266,7 +266,7 @@ class CUDARenderer(CStyleLanguage):
   smem_prefix = "__shared__ "
   smem_prefix_for_cast = False
   barrier = "__syncthreads();"
-  to_vectorized = {dtypes.float16.vec(4): "make_half4", dtypes.float32.vec(4): "make_float4", dtypes.float16.vec(2): "make_half2", dtypes.float32.vec(2): "make_float2",
+  supported_vector_types = {dtypes.float16.vec(4): "make_half4", dtypes.float32.vec(4): "make_float4", dtypes.float16.vec(2): "make_half2", dtypes.float32.vec(2): "make_float2",
                   dtypes.int32.vec(2): "make_int2", dtypes.int32.vec(4): "make_int4", dtypes.bfloat16.vec(4): "make_bfloat164", dtypes.float16.vec(8): "make_half8", dtypes.bfloat16.vec(8): "make_bfloat168"}
   code_for_workitem = {"g": lambda x: f"blockIdx.{chr(120+x)}", "l": lambda x: f"threadIdx.{chr(120+x)}",
                        "i": lambda x: f"(blockIdx.{chr(120+x)}*blockDim.{chr(120+x)}+threadIdx.{chr(120+x)})"}
@@ -337,7 +337,7 @@ f"""  __attribute__((device)) __attribute__((const)) {dt} __ocml_fmax_f{n}({dt},
   smem_prefix = "__attribute__((shared))"
   barrier = '__builtin_amdgcn_fence(__ATOMIC_RELEASE, "workgroup");' + '__builtin_amdgcn_s_barrier();' + \
             '__builtin_amdgcn_fence(__ATOMIC_ACQUIRE, "workgroup");'
-  to_vectorized = {dtypes.float16.vec(4): "make_half4", dtypes.float32.vec(4): "make_float4", dtypes.float16.vec(2): "make_half2", dtypes.float32.vec(2): "make_float2",
+  supported_vector_types = {dtypes.float16.vec(4): "make_half4", dtypes.float32.vec(4): "make_float4", dtypes.float16.vec(2): "make_half2", dtypes.float32.vec(2): "make_float2",
                    dtypes.int32.vec(2): "make_int2", dtypes.int32.vec(4): "make_int4"}
   uses_ptr_arithmetic = False  # NOTE: this fixes TestLinearizerOverflowAlt
   type_map = {dtypes.bfloat16: "hip_bfloat16"}
