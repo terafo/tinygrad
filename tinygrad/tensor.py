@@ -160,9 +160,9 @@ class Tensor:
     assert len(var_vals) == 0
     return schedule
 
-  def realize(self, *lst:Tensor) -> Tensor:
+  def realize(self, *lst:Tensor, do_update_stats=True) -> Tensor:
     """Trigger the computation needed to create these Tensor(s)."""
-    run_schedule(*self.schedule_with_vars(*lst))
+    run_schedule(*self.schedule_with_vars(*lst), do_update_stats=do_update_stats)
     return self
 
   def replace(self, x:Tensor) -> Tensor:
@@ -1321,7 +1321,7 @@ class Tensor:
 
   def dropout(self, p=0.5) -> Tensor:
     if not Tensor.training or p == 0: return self
-    return self * (Tensor.rand(*self.shape, requires_grad=False, device=self.device) >= p) * (1/(1.0 - p))
+    return self * (Tensor.rand(*self.shape, requires_grad=False, dtype=dtypes.default_float, device=self.device) >= p) * (1/(1.0 - p))
 
   def one_hot(self, num_classes:int) -> Tensor:
     return (self[..., None] == Tensor.arange(num_classes, requires_grad=False, device=self.device)).where(1, 0)
