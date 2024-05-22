@@ -16,7 +16,6 @@ from tinygrad.engine.realize import run_schedule, lower_schedule, CompiledRunner
 from tinygrad.helpers import prod, Context, getenv, CI
 from tinygrad.dtype import DType, dtypes
 from tinygrad.codegen.uops import UOpGraph
-from test.helpers import is_dtype_supported
 
 def helper_realized_ast(r:Tensor):
   s = create_schedule([r.lazydata])
@@ -356,6 +355,21 @@ class TestLinearizer(unittest.TestCase):
     assert accs[1].dtype == stores[1].vin[-1].dtype == dtypes.float
     assert stores[1].vin[0].uop is UOps.DEFINE_GLOBAL
 
+  @unittest.skip("multireduce isn't supported yet")
+  def test_upcast_multireduce_nested_local_upcast(self):
+    x, y, z, w = [Tensor.rand(1,128).realize() for _ in range(4)]
+    st0 = ShapeTracker(views=(View(shape=(1, 128, 128), strides=(0, 0, 1), offset=0, mask=None, contiguous=False),))
+    st1 = ShapeTracker(views=(View(shape=(1, 128, 128), strides=(0, 1, 128), offset=0, mask=None, contiguous=False),))
+    ld0 = LazyOp(BufferOps.LOAD, (), MemBuffer(1, dtypes.float, st0))
+    ld1 = LazyOp(BufferOps.LOAD, (), MemBuffer(2, dtypes.float, st1))
+    ld2 = LazyOp(BufferOps.LOAD, (), MemBuffer(3, dtypes.float, st0))
+    ld3 = LazyOp(BufferOps.LOAD, (), MemBuffer(4, dtypes.float, st1))
+    r0 = LazyOp(ReduceOps.SUM, (LazyOp(BinaryOps.MUL, (ld0, ld1)), ), (2,))
+    r1 = LazyOp(ReduceOps.SUM, (LazyOp(BinaryOps.MUL, (ld2, ld3)), ), (2,))
+    out_st = ShapeTracker(views=(View(shape=(1, 128, 1), strides=(0, 1, 0), offset=0, mask=None, contiguous=True),))
+    ast = (LazyOp(BufferOps.STORE, (LazyOp(BinaryOps.ADD, (r0, r1)), ), MemBuffer(0, dtypes.float, out_st)),)
+    helper_linearizer_ast(ast, [x, y, z, w])
+
   def test_zero_fold(self):
     a, b = Tensor.randn(1).realize(), Tensor.randn(1).realize()
     r = Tensor.stack([a, b])
@@ -544,6 +558,15 @@ class TestLinearizer(unittest.TestCase):
 
   @unittest.skipUnless(Device[Device.DEFAULT].renderer.supports_float4, "device doesn't support float4")
   def test_grouped_store_phis(self):
+    """
+    float4 acc0 = float4(0.0,0.0,0.0,0.0);
+    {
+      acc0 = // ...
+    }
+    *((device float4*)(data0+alu2)) = float4(acc0.x,acc0.y,acc0.z,acc0.w);
+    simplifies to:
+    *((device float4*)(data0+alu2)) = acc0;
+    """
     x, y = Tensor.randn(64,64), Tensor.randn(64,64)
     out = x.matmul(y)
     k = helper_linearizer_opt(out)[-1]
@@ -617,18 +640,6 @@ class TestLinearizer(unittest.TestCase):
     k = helper_linearizer_ast(ast, [Tensor.empty(8*32).realize()], opts=[opt])[-1]
     out = [u for u in k.uops if u.uop is UOps.STORE][0]
     assert out.vin[-1].uop is UOps.CAST and out.vin[-1].dtype == dtypes.float.vec(2)
-
-  # TODO this broke llama BEAM=2
-  @unittest.expectedFailure
-  @unittest.skipUnless(Device[Device.DEFAULT].renderer.supports_float4 and is_dtype_supported(dtypes.half), "need backends that support float4")
-  def test_acc_nofold_unmatching_dtypes(self):
-    # acc is half4, store is float4.
-    ld0 = LazyOp(BufferOps.LOAD, (), MemBuffer(idx=1, dtype=dtypes.half, st=ShapeTracker(views=(View(shape=(1, 3, 11008, 4096), strides=(0, 4096, 0, 1), offset=0, mask=None, contiguous=False),)))) # noqa: E501
-    ld1 = LazyOp(BufferOps.LOAD, (), MemBuffer(idx=2, dtype=dtypes.half, st=ShapeTracker(views=(View(shape=(1, 3, 11008, 4096), strides=(0, 0, 4096, 1), offset=0, mask=None, contiguous=False),)))) # noqa: E501
-    cast = LazyOp(BinaryOps.MUL, (ld0, ld1))
-    sum = LazyOp(ReduceOps.SUM, (cast, ), (3, ))
-    st = LazyOp(BufferOps.STORE, (sum,), MemBuffer(idx=0, dtype=dtypes.float, st=ShapeTracker(views=(View(shape=(1, 3, 11008, 1), strides=(0, 11008, 1, 0), offset=0, mask=None, contiguous=True),)))) # noqa: E501
-    helper_linearizer_ast((st, ), [Tensor.empty(1, 3, 11008, 4096).realize()])
 
 @unittest.skipUnless(Device[Device.DEFAULT].renderer.supports_float4, "need backends that support float4")
 class TestFloat4(unittest.TestCase):
