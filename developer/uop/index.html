@@ -1,0 +1,2294 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://docs.tinygrad.org/developer/uop/">
+      
+      
+        <link rel="prev" href="../function/">
+      
+      
+        <link rel="next" href="../runtime/">
+      
+      
+      <link rel="icon" href="../../favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.34">
+    
+    
+      
+        <title>UOp - tinygrad docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.35f28582.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_markdown_exec_pyodide.css">
+    
+      <link rel="stylesheet" href="../../assets/_markdown_exec_ansi.css">
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="lime">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#tinygrad.ops.UOp" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="tinygrad docs" class="md-header__button md-logo" aria-label="tinygrad docs" data-md-component="logo">
+      
+  <img src="../../logo_tiny_dark.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            tinygrad docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              UOp
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="lime"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="lime"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="lime"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/tinygrad/tinygrad/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="tinygrad docs" class="md-nav__button md-logo" aria-label="tinygrad docs" data-md-component="logo">
+      
+  <img src="../../logo_tiny_dark.svg" alt="logo">
+
+    </a>
+    tinygrad docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/tinygrad/tinygrad/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../.." class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1" id="__nav_1_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Home
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Quickstart
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../showcase/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Showcase
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mnist/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MNIST Tutorial
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            API Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_5_1" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../tensor/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Tensor
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1_5_1" id="__nav_1_5_1_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5_1">
+            <span class="md-nav__icon md-icon"></span>
+            Tensor
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tensor/properties/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Properties
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tensor/creation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Creation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tensor/movement/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Movement
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tensor/elementwise/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Elementwise
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tensor/ops/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Complex Ops
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dtypes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    dtypes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../nn/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    nn (Neural Networks)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env_vars/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Environment Variables
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../runtime/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Runtime
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1_6" id="__nav_1_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Developer
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            Developer
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../developer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Intro
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../function/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Function (autodiff)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    UOp
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    UOp
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOp" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;UOp
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;UOps
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" UOps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.SINK" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;SINK
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.EXT" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;EXT
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.EXPAND" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;EXPAND
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.CONTRACT" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;CONTRACT
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.SHAPETRACKER" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;SHAPETRACKER
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.SWIZZLE" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;SWIZZLE
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.DEFINE_GLOBAL" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;DEFINE_GLOBAL
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.DEFINE_VAR" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;DEFINE_VAR
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.DEFINE_LOCAL" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;DEFINE_LOCAL
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.DEFINE_ACC" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;DEFINE_ACC
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.VCONST" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;VCONST
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.CONST" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;CONST
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.VALID" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;VALID
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.SPECIAL" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;SPECIAL
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.NOOP" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;NOOP
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.GEP" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;GEP
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.CAST" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;CAST
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.BITCAST" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;BITCAST
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.VECTORIZE" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;VECTORIZE
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.ALU" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;ALU
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.REDUCE" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;REDUCE
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.REDUCE_AXIS" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;REDUCE_AXIS
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.WMMA" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;WMMA
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.LOAD" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;LOAD
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.STORE" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;STORE
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.ASSIGN" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;ASSIGN
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.BARRIER" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;BARRIER
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.IF" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;IF
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.RANGE" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;RANGE
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.ENDRANGE" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;ENDRANGE
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinygrad.ops.UOps.ENDIF" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;ENDIF
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_6_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_6_4" id="__nav_1_6_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Runtime
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_6_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_6_4">
+            <span class="md-nav__icon md-icon"></span>
+            Runtime
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../runtime/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Runtime Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hcq/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    HCQ
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tinybox/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    tinybox
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+    <a href="https://github.com/tinygrad/tinygrad/edit/master/docs/developer/uop.md" title="Edit this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/tinygrad/tinygrad/raw/master/docs/developer/uop.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
+    </a>
+  
+
+
+  <h1>UOp</h1>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="tinygrad.ops.UOp" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">UOp</span>
+
+
+<a href="#tinygrad.ops.UOp" class="headerlink" title="Permanent link">¤</a></h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="nf">UOp</span><span class="p">(</span>
+    <span class="n">op</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="tinygrad.ops.UOps" href="#tinygrad.ops.UOps">UOps</a></span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="tinygrad.dtype.DType" href="../../dtypes/#tinygrad.dtype.DType">DType</a></span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">void</span><span class="p">,</span>
+    <span class="n">src</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="typing.Tuple" href="https://docs.python.org/3/library/typing.html#typing.Tuple">Tuple</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="tinygrad.ops.UOp" href="#tinygrad.ops.UOp">UOp</a></span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(),</span>
+    <span class="n">arg</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="tinygrad.ops.MathTrait">MathTrait</span></code></p>
+
+
+                  <details class="quote">
+                    <summary>Source code in <code>tinygrad/ops.py</code></summary>
+                    <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">349</span>
+<span class="normal">350</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">UOps</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span><span class="n">DType</span><span class="o">=</span><span class="n">dtypes</span><span class="o">.</span><span class="n">void</span><span class="p">,</span> <span class="n">src</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">UOp</span><span class="p">,</span><span class="o">...</span><span class="p">]</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(),</span> <span class="n">arg</span><span class="p">:</span><span class="n">Any</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">src</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">arg</span> <span class="o">=</span> <span class="n">op</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">arg</span>
+</code></pre></div></td></tr></table></div>
+                  </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="tinygrad.ops.UOps" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">UOps</span>
+
+
+<a href="#tinygrad.ops.UOps" class="headerlink" title="Permanent link">¤</a></h3>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="tinygrad.ops.FastEnum">FastEnum</span></code></p>
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.SINK" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">SINK</span>
+
+
+<a href="#tinygrad.ops.UOps.SINK" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">SINK</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Holds <code class="language-python highlight"><span class="n">UOps</span><span class="o">.</span><span class="n">STORE</span></code>. SINK defines the AST for a Kernel.</p>
+<ul>
+<li><strong><code class="language-python highlight"><span class="n">dtype</span></code></strong>: <code class="language-python highlight"><span class="n">dtypes</span><span class="o">.</span><span class="n">void</span></code></li>
+<li><strong><code class="language-python highlight"><span class="n">src</span></code></strong>: <code class="language-python highlight"><span class="n">Tuple</span><span class="p">[</span><span class="n">UOp</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span></code>, Only global STOREs are allowed.</li>
+<li><strong><code class="language-python highlight"><span class="n">arg</span></code></strong>: <code class="language-python highlight"><span class="n">Optional</span><span class="p">[</span><span class="n">KernelInfo</span><span class="p">]</span></code></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="language-python highlight"><span class="n">ScheduleItem</span></code> ASTs do not have the <code class="language-python highlight"><span class="n">KernelInfo</span></code> arg, <code class="language-python highlight"><span class="n">Kernel</span></code> inserts this to the SINK later.</p>
+</div>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.EXT" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">EXT</span>
+
+
+<a href="#tinygrad.ops.UOps.EXT" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">EXT</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Holds a single MetaOp. EXT UOps do not need a Kernel.</p>
+<ul>
+<li><strong><code class="language-python highlight"><span class="n">dtype</span></code></strong>: Output DType</li>
+<li><strong><code class="language-python highlight"><span class="n">src</span></code></strong>: <code class="language-python highlight"><span class="n">Tuple</span><span class="p">[]</span></code></li>
+<li><strong><code class="language-python highlight"><span class="n">arg</span></code></strong>: (<code class="language-python highlight"><span class="n">MetaOps</span><span class="o">.</span><span class="n">CUSTOM</span> <span class="o">|</span> <span class="n">MetaOps</span><span class="o">.</span><span class="n">COPY</span> <span class="o">|</span> <span class="n">MetaOps</span><span class="o">.</span><span class="n">EMPTY</span> <span class="o">|</span> <span class="n">MetaOps</span><span class="o">.</span><span class="n">VIEW</span></code>, LazyBuffer arg)</li>
+</ul>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.EXPAND" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">EXPAND</span>
+
+
+<a href="#tinygrad.ops.UOps.EXPAND" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">EXPAND</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.CONTRACT" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">CONTRACT</span>
+
+
+<a href="#tinygrad.ops.UOps.CONTRACT" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">CONTRACT</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.SHAPETRACKER" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">SHAPETRACKER</span>
+
+
+<a href="#tinygrad.ops.UOps.SHAPETRACKER" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">SHAPETRACKER</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Defines the ShapeTracker for a buffer UOp <code class="language-python highlight"><span class="n">UOps</span><span class="o">.</span><span class="n">LOAD</span></code>, <code class="language-python highlight"><span class="n">UOps</span><span class="o">.</span><span class="n">STORE</span></code> or <code class="language-python highlight"><span class="n">UOps</span><span class="o">.</span><span class="n">VALID</span></code>.</p>
+<ul>
+<li><strong><code class="language-python highlight"><span class="n">dtype</span></code></strong>: <code class="language-python highlight"><span class="n">dtypes</span><span class="o">.</span><span class="n">void</span></code></li>
+<li><strong><code class="language-python highlight"><span class="n">src</span></code></strong>: <code class="language-python highlight"><span class="n">Tuple</span><span class="p">[]</span></code></li>
+<li><strong><code class="language-python highlight"><span class="n">arg</span></code></strong>: <code class="language-python highlight"><span class="n">ShapeTracker</span></code></li>
+</ul>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.SWIZZLE" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">SWIZZLE</span>
+
+
+<a href="#tinygrad.ops.UOps.SWIZZLE" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">SWIZZLE</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Swizzle inserts a movement op between a UOp and its children. Because movement ops (reshape, expand, shrink, permute, pad) are not allowed in an AST,
+the scheduler rewrites SWIZZLE by pushing its ShapeTracker through reduceops or elementwise ops to the edges of the graph.</p>
+<p>This movement op can push up to the LOADs and/or down to the STOREs.</p>
+<p>Example:
+<div class="language-python highlight"><pre><span></span><code><span class="n">a</span> <span class="o">=</span> <span class="n">Tensor</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+<span class="n">first_reduce</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">output</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">first_reduce</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</code></pre></div>
+<code class="language-python highlight"><span class="n">first_reduce</span></code> must broadcast to <code class="language-python highlight"><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span></code> before ADD. We UOp this as:</p>
+<div class="language-text highlight"><pre><span></span><code>UOp(UOps.ALU, dtypes.int, arg=BinaryOps.ADD, src=(
+  UOp(UOps.SWIZZLE, dtypes.int, arg=ShapeTracker(views=(View(shape=(32, 32), strides=(0, 0), offset=0, mask=None, contiguous=False),)), src=(
+    UOp(UOps.REDUCE_AXIS, dtypes.int, arg=(BinaryOps.ADD, (0, 1)), src=(
+      UOp(UOps.LOAD, dtypes.int, arg=None, src=(
+        x3:=UOp(UOps.DEFINE_GLOBAL, PtrDType(dtypes.int), arg=1, src=()),
+        UOp(UOps.SHAPETRACKER, dtypes.void, arg=ShapeTracker(views=(View(shape=(32, 32), strides=(32, 1), offset=0, mask=None, contiguous=True),)), src=()),)),)),)),
+  UOp(UOps.LOAD, dtypes.int, arg=None, src=(
+     x3,
+    UOp(UOps.SHAPETRACKER, dtypes.void, arg=ShapeTracker(views=(View(shape=(32, 32), strides=(32, 1), offset=0, mask=None, contiguous=True),)), src=()),)),))
+</code></pre></div>
+<p>The scheduler rewrites this by pushing the expand in SWIZZLE through the reduce, to the LOAD:</p>
+<div class="language-diff highlight"><pre><span></span><code>UOp(UOps.ALU, dtypes.int, arg=BinaryOps.ADD, src=(
+<span class="gd">-   UOp(UOps.SWIZZLE, dtypes.int, arg=ShapeTracker(views=(View(shape=(32, 32), strides=(0, 0), offset=0, mask=None, contiguous=False),)), src=(</span>
+<span class="gd">-     UOp(UOps.REDUCE_AXIS, dtypes.int, arg=(BinaryOps.ADD, (0, 1)), src=(</span>
+<span class="gd">-       UOp(UOps.LOAD, dtypes.int, arg=None, src=(</span>
+<span class="gd">-         x3:=UOp(UOps.DEFINE_GLOBAL, PtrDType(dtypes.int), arg=1, src=()),</span>
+<span class="gd">-         UOp(UOps.SHAPETRACKER, dtypes.void, arg=ShapeTracker(views=(View(shape=(32, 32), strides=(32, 1), offset=0, mask=None, contiguous=True),)), src=()),)),)),)),</span>
+<span class="gi">+   UOp(UOps.REDUCE_AXIS, dtypes.int, arg=(BinaryOps.ADD, (2, 3)), src=(</span>
+<span class="gi">+     UOp(UOps.LOAD, dtypes.int, arg=None, src=(</span>
+<span class="gi">+       x2:=UOp(UOps.DEFINE_GLOBAL, PtrDType(dtypes.int), arg=1, src=()),</span>
+<span class="gi">+       UOp(UOps.SHAPETRACKER, dtypes.void, arg=ShapeTracker(views=(View(shape=(32, 32, 32, 32), strides=(0, 0, 32, 1), offset=0, mask=None, contiguous=False),)), src=()),)),)),</span>
+<span class="w"> </span> UOp(UOps.LOAD, dtypes.int, arg=None, src=(
+<span class="gd">-      x3,</span>
+<span class="gd">-     UOp(UOps.SHAPETRACKER, dtypes.void, arg=ShapeTracker(views=(View(shape=(32, 32), strides=(32, 1), offset=0, mask=None, contiguous=True),)), src=()),)),))</span>
+<span class="gi">+      x2,</span>
+<span class="gi">+     UOp(UOps.SHAPETRACKER, dtypes.void, arg=ShapeTracker(views=(View(shape=(32, 32, 1, 1), strides=(32, 1, 0, 0), offset=0, mask=None, contiguous=True),)), src=()),)),))</span>
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Pushing a SWIZZLE through a reduce changes the axis.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Pushing a SWIZZLE changes the output shape of that UOp. We have to reshape every other adjacent node. eg. reshape of the second LOAD to <code class="language-python highlight"><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></code> above.</p>
+</div>
+<ul>
+<li><strong><code class="language-python highlight"><span class="n">dtype</span></code></strong>: Output DType</li>
+<li><strong><code class="language-python highlight"><span class="n">src</span></code></strong>: <code class="language-python highlight"><span class="n">Tuple</span><span class="p">[</span><span class="n">UOp</span><span class="p">]</span></code>, a single UOp to swizzle.</li>
+<li><strong><code class="language-python highlight"><span class="n">arg</span></code></strong>: ShapeTracker</li>
+</ul>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.DEFINE_GLOBAL" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">DEFINE_GLOBAL</span>
+
+
+<a href="#tinygrad.ops.UOps.DEFINE_GLOBAL" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">DEFINE_GLOBAL</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.DEFINE_VAR" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">DEFINE_VAR</span>
+
+
+<a href="#tinygrad.ops.UOps.DEFINE_VAR" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">DEFINE_VAR</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.DEFINE_LOCAL" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">DEFINE_LOCAL</span>
+
+
+<a href="#tinygrad.ops.UOps.DEFINE_LOCAL" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">DEFINE_LOCAL</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.DEFINE_ACC" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">DEFINE_ACC</span>
+
+
+<a href="#tinygrad.ops.UOps.DEFINE_ACC" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">DEFINE_ACC</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.VCONST" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">VCONST</span>
+
+
+<a href="#tinygrad.ops.UOps.VCONST" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">VCONST</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.CONST" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">CONST</span>
+
+
+<a href="#tinygrad.ops.UOps.CONST" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">CONST</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Defines a single scalar constant value.</p>
+<ul>
+<li>
+<p><strong><code class="language-python highlight"><span class="n">dtype</span></code></strong>: The scalar DType of the value.</p>
+</li>
+<li>
+<p><strong><code class="language-python highlight"><span class="n">src</span></code></strong>: <code class="language-python highlight"><span class="n">Tuple</span><span class="p">[]</span></code></p>
+</li>
+<li>
+<p><strong><code class="language-python highlight"><span class="n">arg</span></code></strong>: The value.</p>
+</li>
+</ul>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.VALID" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">VALID</span>
+
+
+<a href="#tinygrad.ops.UOps.VALID" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">VALID</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>This is the first argument in a masked CONST.</p>
+<ul>
+<li><strong><code class="language-python highlight"><span class="n">dtype</span></code></strong>: <code class="language-python highlight"><span class="n">dtypes</span><span class="o">.</span><span class="n">bool</span></code></li>
+<li><strong><code class="language-python highlight"><span class="n">src</span></code></strong>:
+  <code class="language-python highlight"><span class="n">Tuple</span><span class="p">[</span><span class="n">UOp</span><span class="p">]</span></code><ul>
+<li>UOps.SHAPETRACKER</li>
+</ul>
+</li>
+<li><strong><code class="language-python highlight"><span class="n">arg</span></code></strong>: <code class="language-python highlight"><span class="kc">None</span></code></li>
+</ul>
+<p>A masked CONST is defined as <code class="language-python highlight"><span class="n">valid</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></code>.</p>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.SPECIAL" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">SPECIAL</span>
+
+
+<a href="#tinygrad.ops.UOps.SPECIAL" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">SPECIAL</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.NOOP" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">NOOP</span>
+
+
+<a href="#tinygrad.ops.UOps.NOOP" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">NOOP</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.GEP" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">GEP</span>
+
+
+<a href="#tinygrad.ops.UOps.GEP" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">GEP</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.CAST" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">CAST</span>
+
+
+<a href="#tinygrad.ops.UOps.CAST" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">CAST</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <ul>
+<li><strong><code class="language-python highlight"><span class="n">dtype</span></code></strong>: The casted scalar DType</li>
+<li><strong><code class="language-python highlight"><span class="n">src</span></code></strong>: <code class="language-python highlight"><span class="n">Tuple</span><span class="p">[</span><span class="n">UOp</span><span class="p">]</span></code></li>
+<li><strong><code class="language-python highlight"><span class="n">arg</span></code></strong>: <code class="language-python highlight"><span class="kc">None</span></code></li>
+</ul>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.BITCAST" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">BITCAST</span>
+
+
+<a href="#tinygrad.ops.UOps.BITCAST" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">BITCAST</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <ul>
+<li><strong><code class="language-python highlight"><span class="n">dtype</span></code></strong>: The bitcasted scalar DType</li>
+<li><strong><code class="language-python highlight"><span class="n">src</span></code></strong>: <code class="language-python highlight"><span class="n">Tuple</span><span class="p">[</span><span class="n">UOp</span><span class="p">]</span></code></li>
+<li><strong><code class="language-python highlight"><span class="n">arg</span></code></strong>: <code class="language-python highlight"><span class="kc">None</span></code></li>
+</ul>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.VECTORIZE" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">VECTORIZE</span>
+
+
+<a href="#tinygrad.ops.UOps.VECTORIZE" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">VECTORIZE</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <ul>
+<li><strong><code class="language-python highlight"><span class="n">dtype</span></code></strong>: The upcasted vector DType</li>
+<li><strong><code class="language-python highlight"><span class="n">src</span></code></strong>: <code class="language-python highlight"><span class="n">Tuple</span><span class="p">[</span><span class="n">UOp</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span></code></li>
+<li><strong><code class="language-python highlight"><span class="n">arg</span></code></strong>: <code class="language-python highlight"><span class="kc">None</span></code></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Length of sources must match <code class="language-python highlight"><span class="n">dtype</span><span class="o">.</span><span class="n">count</span></code></p>
+</div>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.ALU" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ALU</span>
+
+
+<a href="#tinygrad.ops.UOps.ALU" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">ALU</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <ul>
+<li><strong><code class="language-python highlight"><span class="n">dtype</span></code></strong>: Output DType</li>
+<li><strong><code class="language-python highlight"><span class="n">src</span></code></strong>: <code class="language-python highlight"><span class="n">Tuple</span><span class="p">[</span><span class="n">UOp</span><span class="p">]</span> <span class="o">|</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">UOp</span><span class="p">,</span> <span class="n">UOp</span><span class="p">]</span> <span class="o">|</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">UOp</span><span class="p">,</span> <span class="n">UOp</span><span class="p">,</span> <span class="n">UOp</span><span class="p">]</span></code></li>
+<li><strong><code class="language-python highlight"><span class="n">arg</span></code></strong>: <code class="language-python highlight"><span class="n">UnaryOps</span> <span class="o">|</span> <span class="n">BinaryOps</span> <span class="o">|</span> <span class="n">TernaryOps</span></code></li>
+</ul>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.REDUCE" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">REDUCE</span>
+
+
+<a href="#tinygrad.ops.UOps.REDUCE" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">REDUCE</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.REDUCE_AXIS" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">REDUCE_AXIS</span>
+
+
+<a href="#tinygrad.ops.UOps.REDUCE_AXIS" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">REDUCE_AXIS</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <ul>
+<li><strong><code class="language-python highlight"><span class="n">dtype</span></code></strong>: Output DType</li>
+<li><strong><code class="language-python highlight"><span class="n">src</span></code></strong>: Input to reduce <code class="language-python highlight"><span class="n">Tuple</span><span class="p">[</span><span class="n">UOp</span><span class="p">]</span></code></li>
+<li><strong><code class="language-python highlight"><span class="n">arg</span></code></strong>: <code class="language-python highlight"><span class="p">(</span><span class="n">BinaryOps</span><span class="o">.</span><span class="n">ADD</span> <span class="o">|</span> <span class="n">BinaryOps</span><span class="o">.</span><span class="n">MUL</span> <span class="o">|</span> <span class="n">BinaryOps</span><span class="o">.</span><span class="n">MAX</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span></code></li>
+</ul>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.WMMA" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">WMMA</span>
+
+
+<a href="#tinygrad.ops.UOps.WMMA" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">WMMA</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.LOAD" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">LOAD</span>
+
+
+<a href="#tinygrad.ops.UOps.LOAD" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">LOAD</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <ul>
+<li><strong><code class="language-python highlight"><span class="n">dtype</span></code></strong>: Output DType</li>
+<li><strong><code class="language-python highlight"><span class="n">src</span></code></strong>:</li>
+</ul>
+<p>The scheduler and Kernel create LOADs with a SHAPETRACKER uop in src.</p>
+<ul>
+<li>
+<p>Normal LOAD: <code class="language-python highlight"><span class="n">Tuple</span><span class="p">[</span><span class="n">UOp</span><span class="p">,</span> <span class="n">UOp</span><span class="p">]</span></code></p>
+<ul>
+<li>Buffer UOp <code class="language-python highlight"><span class="n">UOps</span><span class="o">.</span><span class="n">DEFINE_GLOBAL</span></code>.</li>
+<li>SHAPETRACKER UOp.</li>
+</ul>
+</li>
+<li>
+<p>Local LOAD: <code class="language-python highlight"><span class="n">Tuple</span><span class="p">[</span><span class="n">UOp</span><span class="p">,</span> <span class="n">UOp</span><span class="p">,</span> <span class="n">UOp</span><span class="p">]</span></code></p>
+<ul>
+<li>Buffer UOp <code class="language-python highlight"><span class="n">UOps</span><span class="o">.</span><span class="n">DEFINE_LOCAL</span></code>.</li>
+<li>SHAPETRACKER UOp.</li>
+<li>Local UOps.STORE to the same local buffer. We will barrier this later.</li>
+</ul>
+</li>
+</ul>
+<p>The Lowerer replaces the SHAPETRACKER with an indexing uop and gates the LOAD if needed.</p>
+<ul>
+<li>Normal LOAD: <code class="language-python highlight"><span class="n">Tuple</span><span class="p">[</span><span class="n">UOp</span><span class="p">,</span> <span class="n">UOp</span><span class="p">]</span></code><ul>
+<li>Buffer UOp <code class="language-python highlight"><span class="n">UOps</span><span class="o">.</span><span class="n">DEFINE_GLOBAL</span></code>.</li>
+<li>Indexing UOp, can only return <code class="language-python highlight"><span class="n">dtypes</span><span class="o">.</span><span class="n">int32</span></code>.</li>
+</ul>
+</li>
+<li>Gated LOAD: <code class="language-python highlight"><span class="n">Tuple</span><span class="p">[</span><span class="n">UOp</span><span class="p">,</span> <span class="n">UOp</span><span class="p">,</span> <span class="n">UOp</span><span class="p">,</span> <span class="n">UOp</span><span class="p">]</span></code><ul>
+<li>Buffer UOp <code class="language-python highlight"><span class="n">UOps</span><span class="o">.</span><span class="n">DEFINE_GLOBAL</span></code>.</li>
+<li>Indexing UOp, can only return <code class="language-python highlight"><span class="n">dtypes</span><span class="o">.</span><span class="n">int32</span></code>.</li>
+<li>Gate UOp, can only return <code class="language-python highlight"><span class="n">dtypes</span><span class="o">.</span><span class="n">bool</span></code>.</li>
+<li>Value if gate is <code class="language-python highlight"><span class="kc">False</span></code>, can only be a <code class="language-python highlight"><span class="n">UOps</span><span class="o">.</span><span class="n">CONST</span></code> with arg 0, 0.0 or <code class="language-python highlight"><span class="kc">False</span></code>.</li>
+</ul>
+</li>
+<li>Barriered LOAD: <code class="language-python highlight"><span class="n">Tuple</span><span class="p">[</span><span class="n">UOp</span><span class="p">,</span> <span class="n">UOp</span><span class="p">,</span> <span class="n">UOp</span><span class="p">,</span> <span class="n">UOp</span><span class="p">]</span></code><ul>
+<li>Buffer UOp <code class="language-python highlight"><span class="n">UOps</span><span class="o">.</span><span class="n">DEFINE_LOCAL</span></code>.</li>
+<li>Indexing UOp, can only return <code class="language-python highlight"><span class="n">dtypes</span><span class="o">.</span><span class="n">int32</span></code>.</li>
+<li>Gate UOp, can only return <code class="language-python highlight"><span class="n">dtypes</span><span class="o">.</span><span class="n">bool</span></code>.</li>
+<li>Barrier UOp <code class="language-python highlight"><span class="n">UOps</span><span class="o">.</span><span class="n">BARRIER</span></code>.</li>
+</ul>
+</li>
+<li><strong><code class="language-python highlight"><span class="n">arg</span></code></strong>: <code class="language-python highlight"><span class="kc">None</span></code></li>
+</ul>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.STORE" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">STORE</span>
+
+
+<a href="#tinygrad.ops.UOps.STORE" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">STORE</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <ul>
+<li><strong><code class="language-python highlight"><span class="n">dtype</span></code></strong>: <code class="language-python highlight"><span class="n">dtypes</span><span class="o">.</span><span class="n">void</span></code></li>
+<li><strong><code class="language-python highlight"><span class="n">src</span></code></strong>:</li>
+</ul>
+<p>Similar to LOAD, the scheduler and Kernel create STOREs with a SHAPETRACKER uop in src:</p>
+<ul>
+<li>Buffer UOp <code class="language-python highlight"><span class="n">UOps</span><span class="o">.</span><span class="n">DEFINE_GLOBAL</span></code> or <code class="language-python highlight"><span class="n">UOps</span><span class="o">.</span><span class="n">DEFINE_LOCAL</span></code>.</li>
+<li>SHAPETRACKER UOp.</li>
+<li>Value to store.</li>
+</ul>
+<p>The Lowerer replaces the SHAPETRACKER with an indexing uop and gates the STORE if needed.</p>
+<ul>
+<li>Normal STORE: <code class="language-python highlight"><span class="n">Tuple</span><span class="p">[</span><span class="n">UOp</span><span class="p">,</span> <span class="n">UOp</span><span class="p">,</span> <span class="n">UOp</span><span class="p">]</span></code><ul>
+<li>Buffer UOp <code class="language-python highlight"><span class="n">UOps</span><span class="o">.</span><span class="n">DEFINE_GLOBAL</span></code> or <code class="language-python highlight"><span class="n">UOps</span><span class="o">.</span><span class="n">DEFINE_LOCAL</span></code>.</li>
+<li>Indexing UOp, can only return <code class="language-python highlight"><span class="n">dtypes</span><span class="o">.</span><span class="n">int32</span></code>.</li>
+<li>Value to store.</li>
+</ul>
+</li>
+<li>Gated STORE: <code class="language-python highlight"><span class="n">Tuple</span><span class="p">[</span><span class="n">UOp</span><span class="p">,</span> <span class="n">UOp</span><span class="p">,</span> <span class="n">UOp</span><span class="p">,</span> <span class="n">UOp</span><span class="p">]</span></code><ul>
+<li>Buffer UOp <code class="language-python highlight"><span class="n">UOps</span><span class="o">.</span><span class="n">DEFINE_GLOBAL</span></code> or <code class="language-python highlight"><span class="n">UOps</span><span class="o">.</span><span class="n">DEFINE_LOCAL</span></code>.</li>
+<li>Indexing UOp, can only return <code class="language-python highlight"><span class="n">dtypes</span><span class="o">.</span><span class="n">int32</span></code>.</li>
+<li>Value to store.</li>
+<li>Gate UOp, can only return <code class="language-python highlight"><span class="n">dtypes</span><span class="o">.</span><span class="n">bool</span></code>. We rewrite this to an IF block in the end.</li>
+</ul>
+</li>
+<li><strong><code class="language-python highlight"><span class="n">arg</span></code></strong>: <code class="language-python highlight"><span class="kc">None</span></code></li>
+</ul>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.ASSIGN" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ASSIGN</span>
+
+
+<a href="#tinygrad.ops.UOps.ASSIGN" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">ASSIGN</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.BARRIER" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">BARRIER</span>
+
+
+<a href="#tinygrad.ops.UOps.BARRIER" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">BARRIER</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Inserts a warp sync between local stores and local loads.</p>
+<ul>
+<li><strong><code class="language-python highlight"><span class="n">dtype</span></code></strong>: <code class="language-python highlight"><span class="n">dtypes</span><span class="o">.</span><span class="n">void</span></code></li>
+<li><strong><code class="language-python highlight"><span class="n">src</span></code></strong>: <code class="language-python highlight"><span class="n">Tuple</span><span class="p">[</span><span class="n">UOp</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span></code>, Only local STOREs are allowed.</li>
+<li><strong><code class="language-python highlight"><span class="n">arg</span></code></strong>: <code class="language-python highlight"><span class="kc">None</span></code></li>
+</ul>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.IF" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">IF</span>
+
+
+<a href="#tinygrad.ops.UOps.IF" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">IF</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Gates a single STORE to global memory. The IF block could also contain additional UOps the STORE depends on.</p>
+<ul>
+<li><strong><code class="language-python highlight"><span class="n">dtype</span></code></strong>: <code class="language-python highlight"><span class="n">dtypes</span><span class="o">.</span><span class="n">void</span></code></li>
+<li><strong><code class="language-python highlight"><span class="n">src</span></code></strong>:
+  <code class="language-python highlight"><span class="n">Tuple</span><span class="p">[</span><span class="n">UOp</span><span class="p">,</span> <span class="n">UOp</span><span class="p">]</span></code><ul>
+<li>Gate UOp, can only return <code class="language-python highlight"><span class="n">dtypes</span><span class="o">.</span><span class="n">bool</span></code></li>
+<li>The second UOp starts the gate block; All of its children are gated until the final STORE.</li>
+</ul>
+</li>
+<li><strong><code class="language-python highlight"><span class="n">arg</span></code></strong>: <code class="language-python highlight"><span class="kc">None</span></code></li>
+</ul>
+<p>For example, a local reduce must only run on one thread.</p>
+<p>The STORE's IF gate:
+<div class="language-text highlight"><pre><span></span><code>UOp(UOps.IF, src=(
+  UOp(UOps.ALU, dtypes.bool, (...), BinaryOps.CMPNE),
+  UOp(UOps.BARRIER, dtypes.void, (...))))
+</code></pre></div>
+The kernel:
+<div class="language-text highlight"><pre><span></span><code>barrier(CLK_LOCAL_MEM_FENCE);
+if (lidx0!=1) {
+  int acc1 = 0;
+  for (int ridx1 = 0; ridx1 &lt; 16; ridx1++) {
+    int val1 = temp1[ridx1];
+    acc1 = (acc1+val1);
+  }
+  data0[0] = acc1;
+}
+</code></pre></div></p>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.RANGE" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">RANGE</span>
+
+
+<a href="#tinygrad.ops.UOps.RANGE" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">RANGE</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.ENDRANGE" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ENDRANGE</span>
+
+
+<a href="#tinygrad.ops.UOps.ENDRANGE" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">ENDRANGE</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="tinygrad.ops.UOps.ENDIF" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ENDIF</span>
+
+
+<a href="#tinygrad.ops.UOps.ENDIF" class="headerlink" title="Permanent link">¤</a></h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span class="n">ENDIF</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="enum.auto" href="https://docs.python.org/3/library/enum.html#enum.auto">auto</a></span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+    </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../function/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Function (autodiff)">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Function (autodiff)
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../runtime/" class="md-footer__link md-footer__link--next" aria-label="Next: Runtime Overview">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Runtime Overview
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.expand", "navigation.top", "navigation.path", "search.highlight", "search.suggest", "toc.follow", "toc.integrate"], "search": "../../assets/javascripts/workers/search.07f07601.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.56dfad97.min.js"></script>
+      
+        <script src="../../assets/_markdown_exec_pyodide.js"></script>
+      
+    
+  </body>
+</html>
